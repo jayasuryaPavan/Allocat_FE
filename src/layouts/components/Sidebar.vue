@@ -1,0 +1,204 @@
+<template>
+  <div class="h-full flex flex-col">
+    <!-- Logo -->
+    <div class="flex items-center justify-between h-16 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div v-if="!collapsed" class="flex items-center">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">Allocat</span>
+      </div>
+      <button
+        @click="$emit('toggle')"
+        class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 py-4 space-y-2">
+      <template v-for="item in visibleItems" :key="item.name">
+        <router-link
+          :to="item.href"
+          :class="[
+            'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200',
+            isActiveRoute(item.href)
+              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
+              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
+          ]"
+        >
+          <component
+            :is="item.icon"
+            :class="[
+              'flex-shrink-0 w-5 h-5',
+              isActiveRoute(item.href)
+                ? 'text-blue-500 dark:text-blue-400'
+                : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+            ]"
+          />
+          <span v-if="!collapsed" class="ml-3">{{ item.name }}</span>
+        </router-link>
+      </template>
+    </nav>
+
+    <!-- User section -->
+    <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+      <div v-if="!collapsed" class="flex items-center">
+        <div class="flex-shrink-0">
+          <img
+            v-if="currentUser?.avatar"
+            :src="currentUser.avatar"
+            :alt="currentUser.fullName"
+            class="w-8 h-8 rounded-full"
+          />
+          <div
+            v-else
+            class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center"
+          >
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}
+            </span>
+          </div>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-900 dark:text-white">
+            {{ currentUser?.fullName }}
+          </p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            {{ currentUser?.role?.displayName }}
+          </p>
+        </div>
+      </div>
+      <div v-else class="flex justify-center">
+        <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/core/stores/auth'
+
+// Icons
+import {
+  HomeIcon,
+  ShoppingCartIcon,
+  CubeIcon,
+  ArchiveBoxIcon,
+  ShoppingBagIcon,
+  UsersIcon,
+  ChartBarIcon,
+  CogIcon
+} from '@heroicons/vue/24/outline'
+
+interface Props {
+  collapsed: boolean
+}
+
+defineProps<Props>()
+defineEmits<{
+  toggle: []
+}>()
+
+const route = useRoute()
+const authStore = useAuthStore()
+
+// Computed
+const currentUser = computed(() => authStore.currentUser)
+
+const navigationItems = computed(() => [
+  {
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: HomeIcon,
+    roles: ['*'], // Available to all authenticated users
+    permissions: []
+  },
+  {
+    name: 'POS',
+    href: '/pos',
+    icon: ShoppingCartIcon,
+    roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+    permissions: ['orders:create']
+  },
+  {
+    name: 'Products',
+    href: '/products',
+    icon: CubeIcon,
+    roles: ['INVENTORY_MANAGER', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+    permissions: ['products:read']
+  },
+  {
+    name: 'Inventory',
+    href: '/inventory',
+    icon: ArchiveBoxIcon,
+    roles: ['INVENTORY_MANAGER', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN', 'WAREHOUSE_STAFF'],
+    permissions: ['inventory:read']
+  },
+  {
+    name: 'Purchases',
+    href: '/purchases',
+    icon: ShoppingBagIcon,
+    roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+    permissions: ['orders:read']
+  },
+  {
+    name: 'Customers',
+    href: '/customers',
+    icon: UsersIcon,
+    roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+    permissions: ['orders:read']
+  },
+  {
+    name: 'Reports',
+    href: '/reports',
+    icon: ChartBarIcon,
+    roles: ['STORE_MANAGER', 'ACCOUNTANT', 'ADMIN', 'SUPER_ADMIN'],
+    permissions: ['reports:view']
+  },
+  {
+    name: 'Admin',
+    href: '/admin',
+    icon: CogIcon,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
+    permissions: ['users:read']
+  },
+  {
+    name: 'Users',
+    href: '/admin/users',
+    icon: UsersIcon,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
+    permissions: ['users:read']
+  },
+  // Note: Stores module is intentionally NOT added to sidebar per requirement
+])
+
+// Methods
+const isActiveRoute = (href: string): boolean => {
+  return route.path === href || route.path.startsWith(href + '/')
+}
+
+// Filter by role/permission
+const visibleItems = computed(() => {
+  const user = currentUser.value
+  return (navigationItems.value as any[]).filter(item => {
+    // Role check
+    const roleOk = item.roles?.includes('*') || (user && authStore.hasAnyRole(item.roles || []))
+    // Permission check
+    const permOk = !item.permissions || item.permissions.length === 0 || (user && authStore.hasAnyPermissions(item.permissions))
+    return roleOk && permOk
+  })
+})
+</script>
+

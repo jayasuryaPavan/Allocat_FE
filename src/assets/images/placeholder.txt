@@ -1,0 +1,2 @@
+This directory contains images for the application.
+Place your logo, icons, and other images here.

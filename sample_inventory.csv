@@ -1,0 +1,9 @@
+product_code,product_name,expected_quantity,unit_price,supplier_name,supplier_invoice,batch_number,notes
+PROD001,Laptop Pro 15,25,1299.99,TechCorp,INV-001,BATCH-001,High-performance laptop for professionals
+PROD002,Wireless Mouse,150,29.99,TechCorp,INV-002,BATCH-002,Ergonomic wireless mouse
+PROD003,Office Chair,12,199.99,FurniturePlus,INV-003,BATCH-003,Ergonomic office chair
+PROD004,Desk Lamp,45,49.99,FurniturePlus,INV-004,BATCH-004,LED desk lamp with adjustable brightness
+PROD005,Notebook Set,200,12.99,OfficeSupplies,INV-005,BATCH-005,Set of 5 notebooks
+PROD006,Pen Set,300,8.99,OfficeSupplies,INV-006,BATCH-006,Set of 10 pens
+PROD007,Monitor 24",8,299.99,TechCorp,INV-007,BATCH-007,24-inch Full HD monitor
+PROD008,Keyboard,35,79.99,TechCorp,INV-008,BATCH-008,Mechanical keyboard
