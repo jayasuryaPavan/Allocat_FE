@@ -1,0 +1,2 @@
+This directory contains unit tests for the application.
+Unit tests are written using Jasmine and run with Karma.

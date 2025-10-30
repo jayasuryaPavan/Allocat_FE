@@ -1,0 +1,2 @@
+This directory contains integration tests for the application.
+Integration tests verify the interaction between different components and services.
