@@ -43,7 +43,7 @@ curl -fsSL https://ollama.com/install.sh | sh
 
 ### 1.2 Download Llama3 Model
 
-```bash
+```bash 
 ollama pull llama3
 ```
 
