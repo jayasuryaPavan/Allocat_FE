@@ -1,9 +1,10 @@
 import axios, { type AxiosInstance } from 'axios'
 import type { ChatRequest, ChatApiResponse } from '../types/chat'
 import { useNotificationStore } from '@/core/stores/notification'
+import { environment } from '@/environments'
 
-// InvenGadu chat API URL - defaults to localhost:8000 (LangChain FastAPI backend)
-const CHAT_API_URL = import.meta.env.VITE_INVEN_GADU_API_URL || 'http://localhost:8000'
+// InvenGadu chat API URL - defaults to Spring Boot backend on port 8080
+const CHAT_API_URL = import.meta.env.VITE_INVEN_GADU_API_URL || environment.apiUrl
 
 export class InvenGaduApiService {
   private axiosInstance: AxiosInstance
@@ -37,12 +38,12 @@ export class InvenGaduApiService {
         } else if (error.response?.status === 404) {
           notificationStore.warning(
             'InvenGadu Not Found',
-            'The AI assistant service is not running. Please ensure the LangChain backend is started on port 8000.'
+            'The AI assistant service is not running. Please ensure the Spring Boot backend is started on port 8080.'
           )
         } else if (error.code === 'ECONNREFUSED') {
           notificationStore.warning(
             'Connection Failed',
-            'Cannot connect to InvenGadu. Please ensure the LangChain backend is running on http://localhost:8000'
+            'Cannot connect to InvenGadu. Please ensure the Spring Boot backend is running on http://localhost:8080'
           )
         }
 
@@ -58,7 +59,7 @@ export class InvenGaduApiService {
     try {
       const payload = {
         message: request.message,
-        ...(this.conversationId && { conversation_id: this.conversationId })
+        conversationId: request.conversationId || 'default'
       }
 
       const response = await this.axiosInstance.post<ChatApiResponse>('/chat', payload)
@@ -74,8 +75,8 @@ export class InvenGaduApiService {
       return {
         success: false,
         data: {
-          message: error.response?.data?.detail || 'Failed to get response from InvenGadu. Please try again.',
-          conversationId: this.conversationId || undefined
+          message: error.response?.data?.message || 'Failed to get response from InvenGadu. Please try again.',
+          conversationId: this.conversationId || request.conversationId || 'default'
         },
         message: 'Error communicating with InvenGadu'
       }
@@ -85,8 +86,20 @@ export class InvenGaduApiService {
   /**
    * Start a new conversation
    */
-  startNewConversation() {
-    this.conversationId = null
+  async startNewConversation(conversationId: string = 'default'): Promise<boolean> {
+    try {
+      const response = await this.axiosInstance.post<ChatApiResponse>(`/chat/new?conversationId=${conversationId}`)
+      
+      if (response.data.success) {
+        this.conversationId = conversationId
+        return true
+      }
+      
+      return false
+    } catch (error) {
+      console.error('Failed to start new conversation:', error)
+      return false
+    }
   }
 
   /**
@@ -97,10 +110,18 @@ export class InvenGaduApiService {
   }
 
   /**
+   * Set conversation ID
+   */
+  setConversationId(conversationId: string) {
+    this.conversationId = conversationId
+  }
+
+  /**
    * Check if InvenGadu service is available
    */
   async checkHealth(): Promise<boolean> {
     try {
+      // Check if the backend is responding
       const response = await this.axiosInstance.get('/health')
       return response.status === 200
     } catch {
