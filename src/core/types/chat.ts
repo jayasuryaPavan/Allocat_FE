@@ -15,9 +15,8 @@ export interface ChatResponse {
   message: string
   conversationId?: string
   metadata?: {
-    sources?: string[]
-    confidence?: number
-    action_taken?: string
+    model?: string
+    tools_used?: boolean
   }
 }
 
