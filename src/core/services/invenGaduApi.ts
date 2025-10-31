@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance } from 'axios'
 import type { ChatRequest, ChatApiResponse } from '../types/chat'
 import { useNotificationStore } from '@/core/stores/notification'
+import { useAuthStore } from '@/core/stores/auth'
 import { environment } from '@/environments'
 
 // InvenGadu chat API URL - defaults to Spring Boot backend on port 8080
@@ -24,13 +25,35 @@ export class InvenGaduApiService {
   }
 
   private setupInterceptors() {
+    // Request interceptor to add auth token
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        const authStore = useAuthStore()
+        const token = authStore.getToken()
+        
+        if (token && !config.headers.Authorization) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
+        
+        return config
+      },
+      (error) => {
+        return Promise.reject(error)
+      }
+    )
+
     // Response interceptor for error handling
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
         const notificationStore = useNotificationStore()
 
-        if (error.response?.status >= 500) {
+        if (error.response?.status === 401) {
+          notificationStore.error(
+            'Authentication Required',
+            'Please log in to use the InvenGadu AI assistant.'
+          )
+        } else if (error.response?.status >= 500) {
           notificationStore.error(
             'InvenGadu Error',
             'The AI assistant is temporarily unavailable. Please try again later.'
