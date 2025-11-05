@@ -41,13 +41,13 @@
         <input v-model="form.firstName" placeholder="First name" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
         <input v-model="form.lastName" placeholder="Last name" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
         <input v-model="form.username" placeholder="Username" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
-        <input v-model="form.email" placeholder="Email" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
-        <input v-model="form.phone" placeholder="Phone" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
-        <select v-model="form.roleName" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600">
-          <option disabled value="">Select role</option>
+        <input v-model="form.email" type="email" placeholder="Email" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+        <input v-model="form.password" type="password" placeholder="Password" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+        <input v-model="form.phone" placeholder="Phone *" required class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+        <select v-model="form.roleName" required class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600">
+          <option disabled value="">Select role *</option>
           <option v-for="r in availableRoles" :key="r" :value="r">{{ r }}</option>
         </select>
-        <input v-if="needsStore" v-model.number="form.storeId" type="number" placeholder="Store ID" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />
       </div>
       <div class="flex items-center justify-end space-x-2">
         <button @click="closeCreate" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 rounded-md">Cancel</button>
@@ -72,9 +72,10 @@ const form = ref({
   lastName: '',
   username: '',
   email: '',
+  password: '',
   phone: '',
   roleName: '' as string,
-  storeId: undefined as number | undefined
+  storeCode: '' as string
 })
 
 const availableRoles = computed(() => {
@@ -88,33 +89,74 @@ const availableRoles = computed(() => {
   return []
 })
 
-const needsStore = computed(() => form.value.roleName === 'ADMIN')
-
 const fetchUsers = async () => {
   const resp = await UsersApiService.getAllUsers()
   if (resp.success) users.value = resp.data
 }
 
-onMounted(fetchUsers)
+onMounted(() => {
+  fetchUsers()
+})
 
 const closeCreate = () => {
   showCreate.value = false
 }
 
 const createUser = async () => {
+  // Validate all required fields
+  if (!form.value.firstName || !form.value.lastName || !form.value.username || 
+      !form.value.email || !form.value.password || !form.value.phone || 
+      !form.value.roleName) {
+    alert('Please fill in all required fields')
+    return
+  }
+  
+  // Get store code from session/local storage
+  const storeCode = sessionStorage.getItem('active_store_code') || localStorage.getItem('active_store_code')
+  if (!storeCode) {
+    alert('Store code not found. Please ensure you are logged in with a valid store.')
+    return
+  }
+  
   // Enforce ADMIN cannot create ADMIN
   const currentRole = (auth.currentUser?.role?.name || '').toUpperCase()
-  if (currentRole === 'ADMIN' && form.value.roleName === 'ADMIN') return
-  if (form.value.roleName === 'ADMIN' && !form.value.storeId) return
-  // ADMIN default storeId to their own store if needed - if you have it on user
+  if (currentRole === 'ADMIN' && form.value.roleName === 'ADMIN') {
+    alert('ADMIN users cannot create other ADMIN users')
+    return
+  }
+  
   try {
-    const payload: any = { ...form.value }
+    const payload = {
+      username: form.value.username,
+      email: form.value.email,
+      password: form.value.password,
+      firstName: form.value.firstName,
+      lastName: form.value.lastName,
+      phone: form.value.phone,
+      roleName: form.value.roleName,
+      storeCode: storeCode // Automatically from session storage
+    }
+    
     const resp = await UsersApiService.createUser(payload)
     if (resp.success) {
       await fetchUsers()
       showCreate.value = false
+      
+      // Reset form
+      form.value = {
+        firstName: '',
+        lastName: '',
+        username: '',
+        email: '',
+        password: '',
+        phone: '',
+        roleName: '',
+        storeCode: ''
+      }
     }
-  } catch {}
+  } catch (error: any) {
+    alert(error.response?.data?.message || 'Failed to create user')
+  }
 }
 </script>
 

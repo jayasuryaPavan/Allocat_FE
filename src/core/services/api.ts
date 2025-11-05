@@ -34,10 +34,10 @@ export class ApiService {
           config.headers.Authorization = `Bearer ${token}`
         }
 
-        // Attach active store header if present
-        const activeStoreId = localStorage.getItem('active_store_id')
-        if (activeStoreId) {
-          config.headers['X-Store-Id'] = activeStoreId
+        // Attach active store code header if present
+        const activeStoreCode = localStorage.getItem('active_store_code')
+        if (activeStoreCode) {
+          config.headers['X-Store-Code'] = activeStoreCode
         }
 
         // Show loading for non-GET requests
