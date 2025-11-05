@@ -186,11 +186,11 @@
             <button
               v-for="s in stores"
               :key="s.id"
-              @click="selectStore(s.id)"
+              @click="selectStore(String(s.id))"
               class="w-full text-left px-4 py-3 text-sm flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              <span class="text-gray-900 dark:text-white">{{ s.id }} - {{ s.name }}</span>
-              <span v-if="String(s.id) === activeStoreId" class="text-xs text-blue-600 dark:text-blue-400">Active</span>
+              <span class="text-gray-900 dark:text-white">{{ s.code }} - {{ s.name }}</span>
+              <span v-if="String(s.code) === activeStoreCode" class="text-xs text-blue-600 dark:text-blue-400">Active</span>
             </button>
           </div>
           <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-right">
@@ -240,16 +240,16 @@ const currentUser = computed(() => authStore.currentUser)
 const isDarkMode = computed(() => themeStore.isDarkMode)
 const isSuperAdmin = computed(() => (currentUser.value?.role?.name || '').toUpperCase() === 'SUPER_ADMIN')
 
-// Store switcher state
-const activeStoreId = ref<string | null>(localStorage.getItem('active_store_id'))
-const stores = ref<{ id: number; name: string }[]>([])
+// Store switcher state (using store code instead of ID)
+const activeStoreCode = ref<string | null>(localStorage.getItem('active_store_code'))
+const stores = ref<{ id: number; code: string; name: string }[]>([])
 
 const showStoreModal = ref(false)
 const openStoreModal = () => { showStoreModal.value = true }
 const closeStoreModal = () => { showStoreModal.value = false }
-const selectStore = (id: number) => {
-  activeStoreId.value = String(id)
-  localStorage.setItem('active_store_id', String(id))
+const selectStore = (code: string) => {
+  activeStoreCode.value = code
+  localStorage.setItem('active_store_code', code)
   showStoreModal.value = false
 }
 
@@ -259,9 +259,9 @@ onMounted(async () => {
       const resp = await StoresApiService.list({ active: true })
       if (resp.success) {
         stores.value = resp.data
-        if (!activeStoreId.value && stores.value.length > 0) {
-          activeStoreId.value = String(stores.value[0].id)
-          localStorage.setItem('active_store_id', String(stores.value[0].id))
+        if (!activeStoreCode.value && stores.value.length > 0) {
+          activeStoreCode.value = stores.value[0].code
+          localStorage.setItem('active_store_code', stores.value[0].code)
         }
       }
     } catch {}

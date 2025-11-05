@@ -5,12 +5,13 @@ import type { User } from '../types/user'
 export interface CreateUserRequest {
   username: string
   email: string
-  password?: string
+  password: string
   firstName: string
   lastName: string
   phone?: string
   roleName?: string
-  storeId?: number
+  storeCode: string
+  storeId?: number // deprecated - use storeCode instead
 }
 
 const api = new ApiService()

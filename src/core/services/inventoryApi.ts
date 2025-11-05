@@ -135,13 +135,17 @@ export class InventoryApiService {
     search?: string
     category?: string
     supplier?: string
-  }): Promise<PaginatedResponse<Product>> {
+    sortBy?: string
+    sortDirection?: 'asc' | 'desc'
+  }): Promise<ApiResponse<Product[]>> {
     const queryParams = new URLSearchParams()
     if (params?.page !== undefined) queryParams.append('page', params.page.toString())
     if (params?.size !== undefined) queryParams.append('size', params.size.toString())
     if (params?.search) queryParams.append('search', params.search)
     if (params?.category) queryParams.append('category', params.category)
     if (params?.supplier) queryParams.append('supplier', params.supplier)
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+    if (params?.sortDirection) queryParams.append('sortDirection', params.sortDirection)
     
     const response = await api.get(`/products?${queryParams.toString()}`)
     return response.data

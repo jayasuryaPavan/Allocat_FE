@@ -346,6 +346,7 @@ const error = ref('')
 
 // Computed properties
 const filteredInventory = computed(() => {
+  if (!Array.isArray(inventoryItems.value)) return []
   if (!searchTerm.value) return inventoryItems.value
   
   const term = searchTerm.value.toLowerCase()
@@ -368,6 +369,10 @@ const totalPages = computed(() => {
 })
 
 const inventoryStats = computed(() => {
+  if (!Array.isArray(inventoryItems.value)) {
+    return { totalItems: 0, inStock: 0, lowStock: 0, outOfStock: 0 }
+  }
+  
   const total = inventoryItems.value.length
   const inStock = inventoryItems.value.filter(item => item.currentQuantity > 0).length
   const lowStock = inventoryItems.value.filter(item => 
@@ -439,13 +444,17 @@ const loadInventory = async () => {
   
   try {
     const response = await InventoryApiService.getCurrentInventory()
-    if (response.success) {
-      inventoryItems.value = response.data
+    if (response.success && response.data) {
+      // Handle Spring Boot Page structure
+      const pageData = response.data as any
+      inventoryItems.value = Array.isArray(pageData.content) ? pageData.content : []
     } else {
       error.value = response.message || 'Failed to load inventory'
+      inventoryItems.value = []
     }
   } catch (err) {
     error.value = 'Failed to load inventory'
+    inventoryItems.value = []
     console.error('Error loading inventory:', err)
   } finally {
     loading.value = false
