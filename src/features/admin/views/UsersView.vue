@@ -22,9 +22,9 @@
           <tr v-for="u in users" :key="u.id">
             <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.fullName || (u.firstName + ' ' + u.lastName) }}</td>
             <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.email }}</td>
-            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.role?.name }}</td>
+            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.roleName }}</td>
             <td class="px-4 py-2 text-sm">
-              <span :class="u.isActive ? 'text-green-600' : 'text-gray-500'">{{ u.isActive ? 'Active' : 'Inactive' }}</span>
+              <span :class="u.active ? ACTIVE_STATUS_CLASS.active : ACTIVE_STATUS_CLASS.inactive">{{ u.active ? ACTIVE_STATUS_LABEL.active : ACTIVE_STATUS_LABEL.inactive }}</span>
             </td>
           </tr>
         </tbody>
@@ -62,10 +62,30 @@ import { ref, onMounted, computed } from 'vue'
 import { UsersApiService } from '@/core/services/usersApi'
 import type { User } from '@/core/types/user'
 import { useAuthStore } from '@/core/stores/auth'
+import { UserRole } from '@/core/types/user'
 
 const users = ref<User[]>([])
 const showCreate = ref(false)
 const auth = useAuthStore()
+
+// Constants to avoid hardcoded values
+const ACTIVE_STATUS_LABEL = {
+  active: 'Active',
+  inactive: 'Inactive'
+} as const
+
+const ACTIVE_STATUS_CLASS = {
+  active: 'text-green-600',
+  inactive: 'text-gray-500'
+} as const
+
+const STORAGE_KEY_ACTIVE_STORE_CODE = 'active_store_code' as const
+
+const ALERT_MESSAGES = {
+  fillRequired: 'Please fill in all required fields',
+  storeCodeMissing: 'Store code not found. Please ensure you are logged in with a valid store.',
+  adminCannotCreateAdmin: 'ADMIN users cannot create other ADMIN users'
+} as const
 
 const form = ref({
   firstName: '',
@@ -79,14 +99,14 @@ const form = ref({
 })
 
 const availableRoles = computed(() => {
-  const role = (auth.currentUser?.role?.name || '').toUpperCase()
-  if (role === 'SUPER_ADMIN') {
-    return ['ADMIN', 'STORE_MANAGER', 'SALES_STAFF', 'INVENTORY_MANAGER', 'WAREHOUSE_STAFF', 'ACCOUNTANT', 'VIEWER']
+  const role = ((auth.currentUser?.roleName || '').toUpperCase()) as UserRole
+  if (role === UserRole.SUPER_ADMIN) {
+    return Object.values(UserRole).filter(r => r !== UserRole.SUPER_ADMIN)
   }
-  if (role === 'ADMIN') {
-    return ['STORE_MANAGER', 'SALES_STAFF', 'INVENTORY_MANAGER', 'WAREHOUSE_STAFF', 'ACCOUNTANT', 'VIEWER']
+  if (role === UserRole.ADMIN) {
+    return Object.values(UserRole).filter(r => r !== UserRole.SUPER_ADMIN && r !== UserRole.ADMIN)
   }
-  return []
+  return [] as UserRole[]
 })
 
 const fetchUsers = async () => {
@@ -107,21 +127,21 @@ const createUser = async () => {
   if (!form.value.firstName || !form.value.lastName || !form.value.username || 
       !form.value.email || !form.value.password || !form.value.phone || 
       !form.value.roleName) {
-    alert('Please fill in all required fields')
+    alert(ALERT_MESSAGES.fillRequired)
     return
   }
   
   // Get store code from session/local storage
-  const storeCode = sessionStorage.getItem('active_store_code') || localStorage.getItem('active_store_code')
+  const storeCode = sessionStorage.getItem(STORAGE_KEY_ACTIVE_STORE_CODE) || localStorage.getItem(STORAGE_KEY_ACTIVE_STORE_CODE)
   if (!storeCode) {
-    alert('Store code not found. Please ensure you are logged in with a valid store.')
+    alert(ALERT_MESSAGES.storeCodeMissing)
     return
   }
   
   // Enforce ADMIN cannot create ADMIN
-  const currentRole = (auth.currentUser?.role?.name || '').toUpperCase()
-  if (currentRole === 'ADMIN' && form.value.roleName === 'ADMIN') {
-    alert('ADMIN users cannot create other ADMIN users')
+  const currentRole = ((auth.currentUser?.roleName || '').toUpperCase()) as UserRole
+  if (currentRole === UserRole.ADMIN && form.value.roleName === UserRole.ADMIN) {
+    alert(ALERT_MESSAGES.adminCannotCreateAdmin)
     return
   }
   

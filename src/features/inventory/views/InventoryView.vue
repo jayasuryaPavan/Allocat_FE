@@ -292,17 +292,42 @@
                   </button>
                 </div>
 
+                <!-- AI Analyzing Indicator -->
+                <div v-if="isAnalyzing" class="text-center py-12">
+                  <div class="inline-flex items-center space-x-3 px-6 py-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <div class="text-left">
+                      <p class="text-sm font-medium text-blue-900 dark:text-blue-300">InvenGadu is analyzing your CSV...</p>
+                      <p class="text-xs text-blue-700 dark:text-blue-400">Mapping columns automatically</p>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Upload Component -->
                 <CSVUpload
-                  v-if="!showPreview"
+                  v-if="!showPreview && !showMappingReview && !isAnalyzing"
                   @upload-success="handleUploadSuccess"
                   @upload-error="handleUploadError"
                   @file-selected="handleFileSelected"
                 />
 
-                <!-- Preview Component -->
+                <!-- AI Column Mapping Review -->
+                <CSVColumnMappingReview
+                  v-if="showMappingReview && currentMappingResult && csvData"
+                  :mapping-result="currentMappingResult"
+                  :sample-data="csvData.rows"
+                  :available-fields="availableFields"
+                  @confirm="handleMappingConfirmed"
+                  @cancel="handleMappingCancelled"
+                  @ask-ai="handleAskAI"
+                />
+
+                <!-- Preview Component (fallback or non-AI mode) -->
                 <CSVDataPreview
-                  v-if="showPreview && csvData"
+                  v-if="showPreview && !showMappingReview && csvData"
                   :data="csvData"
                   @import="handleImport"
                   @cancel="handleCancelImport"
@@ -320,9 +345,13 @@
 import { ref, computed, onMounted } from 'vue'
 import CSVUpload from '../../../components/CSVUpload.vue'
 import CSVDataPreview from '../../../components/CSVDataPreview.vue'
+import CSVColumnMappingReview from '../../../components/CSVColumnMappingReview.vue'
 import ReceivedStockManager from '../../../components/ReceivedStockManager.vue'
 import StockDiscrepanciesManager from '../../../components/StockDiscrepanciesManager.vue'
 import { InventoryApiService } from '../../../core/services/inventoryApi'
+import { AICsvMappingService } from '../../../core/services/aiCsvMappingService'
+import type { ColumnMapping, AIMappingResult } from '../../../core/services/aiCsvMappingService'
+import { environment } from '../../../environments'
 import type { 
   InventoryItem, 
   CSVInventoryData, 
@@ -335,7 +364,10 @@ import type {
 // Reactive state
 const showImportModal = ref(false)
 const showPreview = ref(false)
+const showMappingReview = ref(false)
+const isAnalyzing = ref(false)
 const csvData = ref<CSVInventoryData | null>(null)
+const currentMappingResult = ref<AIMappingResult | null>(null)
 const inventoryItems = ref<Inventory[]>([])
 const searchTerm = ref('')
 const currentPage = ref(1)
@@ -343,6 +375,21 @@ const itemsPerPage = ref(10)
 const activeTab = ref('inventory')
 const loading = ref(false)
 const error = ref('')
+
+// AI CSV Mapping feature flag
+const enableAICsvMapping = environment.integrations?.enableAICsvMapping ?? false
+
+// Available fields for mapping
+const availableFields = [
+  'productCode',
+  'productName',
+  'expectedQuantity',
+  'unitPrice',
+  'supplierName',
+  'supplierInvoice',
+  'batchNumber',
+  'notes'
+]
 
 // Computed properties
 const filteredInventory = computed(() => {
@@ -388,9 +435,36 @@ const handleFileSelected = (file: File) => {
   console.log('File selected:', file.name)
 }
 
-const handleUploadSuccess = (data: CSVInventoryData) => {
+const handleUploadSuccess = async (data: CSVInventoryData) => {
   csvData.value = data
-  showPreview.value = true
+  
+  // If AI CSV mapping is enabled, analyze columns first
+  if (enableAICsvMapping) {
+    isAnalyzing.value = true
+    
+    try {
+      // AI analyzes and maps columns
+      const mappingResult = await AICsvMappingService.analyzeAndMapColumns(
+        data.headers,
+        data.rows.slice(0, 5), // Send first 5 rows as samples
+        'receivedStock'
+      )
+      
+      currentMappingResult.value = mappingResult
+      showMappingReview.value = true
+      
+      console.log('AI Mapping Result:', mappingResult)
+    } catch (error) {
+      console.error('AI mapping failed, falling back to preview:', error)
+      // Fallback to regular preview
+      showPreview.value = true
+    } finally {
+      isAnalyzing.value = false
+    }
+  } else {
+    // Original flow: show preview directly
+    showPreview.value = true
+  }
 }
 
 const handleUploadError = (error: string) => {
@@ -473,7 +547,48 @@ const handleStockRejected = (stock: ReceivedStock) => {
 
 const handleCancelImport = () => {
   showPreview.value = false
+  showMappingReview.value = false
   csvData.value = null
+  currentMappingResult.value = null
+}
+
+const handleMappingConfirmed = async (mappings: ColumnMapping[]) => {
+  if (!csvData.value) return
+  
+  try {
+    // Transform CSV data using confirmed mappings
+    const transformedData = AICsvMappingService.transformData(csvData.value.rows, mappings)
+    
+    console.log('Transformed data:', transformedData)
+    
+    // Proceed with import using transformed data
+    await handleImport(transformedData)
+    
+    // Close mapping review
+    showMappingReview.value = false
+  } catch (error) {
+    console.error('Failed to transform and import data:', error)
+  }
+}
+
+const handleMappingCancelled = () => {
+  showMappingReview.value = false
+  csvData.value = null
+  currentMappingResult.value = null
+}
+
+const handleAskAI = (unmappedColumns: string[]) => {
+  // Open InvenGadu chat with context about unmapped columns
+  const prompt = `I'm trying to import a CSV file to my inventory system. I have these unmapped columns: ${unmappedColumns.join(', ')}.
+
+My CSV sample data looks like this:
+${JSON.stringify(csvData.value?.rows.slice(0, 2), null, 2)}
+
+My target fields are: ${availableFields.join(', ')}
+
+Can you help me understand which columns should map to which target fields?`
+
+  window.dispatchEvent(new CustomEvent('inven-gadu:open', { detail: { prompt } }))
 }
 
 const getStatusClass = (item: Inventory) => {
