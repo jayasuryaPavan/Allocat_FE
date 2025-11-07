@@ -46,7 +46,7 @@
           <select
             v-model="pageSize"
             @change="fetchProducts"
-            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+            class="pl-[0.75rem] pr-[1.75rem] py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
           >
             <option :value="10">10</option>
             <option :value="25">25</option>

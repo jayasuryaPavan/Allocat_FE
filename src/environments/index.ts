@@ -28,6 +28,11 @@ export const environment = {
     maxFileSize: 10 * 1024 * 1024, // 10MB
     supportedImageTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
     supportedDocumentTypes: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+  },
+  integrations: {
+    enableInvenGaduAssist: true,
+    invenGaduSearchUrl: '',
+    enableAICsvMapping: true // Enable AI-powered CSV column mapping
   }
 }
 

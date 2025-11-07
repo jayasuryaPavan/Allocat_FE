@@ -1,6 +1,7 @@
 <template>
   <div id="app" :class="themeClasses">
     <router-view />
+    <SelectionSearchAssist />
     
     <!-- Global loading overlay -->
     <div v-if="loadingStore.isLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -96,6 +97,7 @@ import { computed } from 'vue'
 import { useThemeStore } from '@/core/stores/theme'
 import { useLoadingStore } from '@/core/stores/loading'
 import { useNotificationStore } from '@/core/stores/notification'
+import SelectionSearchAssist from '@/components/global/SelectionSearchAssist.vue'
 
 const themeStore = useThemeStore()
 const loadingStore = useLoadingStore()
