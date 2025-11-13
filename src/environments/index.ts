@@ -32,7 +32,9 @@ export const environment = {
   integrations: {
     enableInvenGaduAssist: true,
     invenGaduSearchUrl: '',
-    enableAICsvMapping: true // Enable AI-powered CSV column mapping
+    enableAICsvMapping: true, // Enable AI-powered CSV column mapping
+    xtractorApiUrl: 'http://localhost:8000', // Xtractor Agent API endpoint
+    enablePdfExtraction: true // Enable PDF table extraction
   }
 }
 
