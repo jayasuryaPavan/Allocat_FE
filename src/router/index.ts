@@ -121,8 +121,8 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/features/customers/views/CustomersView.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
-          permissions: ['orders:read']
+          roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN', 'VIEWER'],
+          permissions: ['customers:read']
         }
       }
     ]
