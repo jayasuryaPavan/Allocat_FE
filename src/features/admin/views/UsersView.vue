@@ -22,9 +22,9 @@
           <tr v-for="u in users" :key="u.id">
             <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.fullName || (u.firstName + ' ' + u.lastName) }}</td>
             <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.email }}</td>
-            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.roleName }}</td>
+            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ u.role?.displayName || u.role?.name }}</td>
             <td class="px-4 py-2 text-sm">
-              <span :class="u.active ? ACTIVE_STATUS_CLASS.active : ACTIVE_STATUS_CLASS.inactive">{{ u.active ? ACTIVE_STATUS_LABEL.active : ACTIVE_STATUS_LABEL.inactive }}</span>
+              <span :class="u.isActive ? ACTIVE_STATUS_CLASS.active : ACTIVE_STATUS_CLASS.inactive">{{ u.isActive ? ACTIVE_STATUS_LABEL.active : ACTIVE_STATUS_LABEL.inactive }}</span>
             </td>
           </tr>
         </tbody>
@@ -99,7 +99,7 @@ const form = ref({
 })
 
 const availableRoles = computed(() => {
-  const role = ((auth.currentUser?.roleName || '').toUpperCase()) as UserRole
+  const role = ((auth.currentUser?.role?.name || '').toUpperCase()) as UserRole
   if (role === UserRole.SUPER_ADMIN) {
     return Object.values(UserRole).filter(r => r !== UserRole.SUPER_ADMIN)
   }
@@ -139,7 +139,7 @@ const createUser = async () => {
   }
   
   // Enforce ADMIN cannot create ADMIN
-  const currentRole = ((auth.currentUser?.roleName || '').toUpperCase()) as UserRole
+  const currentRole = ((auth.currentUser?.role?.name || '').toUpperCase()) as UserRole
   if (currentRole === UserRole.ADMIN && form.value.roleName === UserRole.ADMIN) {
     alert(ALERT_MESSAGES.adminCannotCreateAdmin)
     return

@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   staging: false,
   development: true,
-  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  apiUrl: 'http://localhost:8080/api', // Defaults to relative URL for Vite proxy
   appName: 'Allocat',
   version: '1.0.0',
   features: {

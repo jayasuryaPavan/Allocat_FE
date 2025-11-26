@@ -100,7 +100,7 @@
             {{ currentUser?.fullName }}
           </p>
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            {{ currentUser?.roleName }}
+            {{ currentUser?.role?.displayName || currentUser?.role?.name }}
           </p>
         </div>
       </div>

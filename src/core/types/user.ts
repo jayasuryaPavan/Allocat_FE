@@ -6,9 +6,9 @@ export interface User {
   fullName: string
   avatar?: string
   phone?: string
-  roleName: string
+  role?: Role
   permissions: Permission[]
-  active: boolean
+  isActive: boolean
   isEmailVerified: boolean
   lastLoginAt?: string
   createdAt: string

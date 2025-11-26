@@ -36,7 +36,7 @@ class XtractorApiService {
   private baseUrl: string
 
   constructor() {
-    this.baseUrl = environment.integrations?.xtractorApiUrl || 'http://localhost:8000'
+    this.baseUrl = environment.apiUrl;
   }
 
   /**
@@ -66,7 +66,7 @@ class XtractorApiService {
       formData.append('file', file)
 
       const response = await axios.post<XtractorResponse>(
-        `${this.baseUrl}/api/v1/extract`,
+        `${this.baseUrl}/v1/extract`,
         formData,
         {
           headers: {
@@ -102,7 +102,7 @@ class XtractorApiService {
   async getExtractionStatus(extractionId: string): Promise<{ success: boolean; data?: XtractorResponse; message?: string }> {
     try {
       const response = await axios.get<XtractorResponse>(
-        `${this.baseUrl}/api/v1/extract/${extractionId}`
+        `${this.baseUrl}/v1/extract/${extractionId}`
       )
 
       return {
@@ -146,4 +146,3 @@ class XtractorApiService {
 }
 
 export const xtractorApi = new XtractorApiService()
-
