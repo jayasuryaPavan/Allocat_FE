@@ -83,8 +83,13 @@ export interface Payment {
 
 export interface SalesOrderItem {
     id: number;
-    productId: number;
-    productName: string;
+    product: {
+        id: number;
+        name: string;
+        sku: string;
+        barcode: string;
+        price: number;
+    };
     quantity: number;
     unitPrice: number;
     discount: number;
@@ -96,9 +101,22 @@ export interface SalesOrderItem {
 export interface SalesOrder {
     id: number;
     orderNo: string;
-    storeId: number;
-    customerId?: number;
-    cashierId: number;
+    store: {
+        id: number;
+        name: string;
+    };
+    customer?: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        email?: string;
+        phone?: string;
+    };
+    cashier: {
+        id: number;
+        firstName: string;
+        lastName: string;
+    };
     orderDate: string;
     subtotal: number;
     taxAmount: number;

@@ -84,6 +84,22 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/analytics',
+    component: () => import('@/layouts/MainLayout.vue'),
+    children: [
+      {
+        path: 'dashboard',
+        name: 'AnalyticsDashboard',
+        component: () => import('@/features/analytics/views/DashboardView.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+          permissions: ['analytics:read']
+        }
+      }
+    ]
+  },
+  {
     path: '/products',
     component: () => import('@/layouts/MainLayout.vue'),
     children: [

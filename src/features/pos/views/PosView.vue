@@ -8,6 +8,8 @@ import CartSummary from '../components/CartSummary.vue'
 import PaymentModal from '../components/PaymentModal.vue'
 import DiscountDialog from '../components/DiscountDialog.vue'
 import CustomerSelector from '../components/CustomerSelector.vue'
+import HeldOrdersModal from '../components/HeldOrdersModal.vue'
+import ReturnOrderModal from '../components/ReturnOrderModal.vue'
 import type { CheckoutRequest } from '../types'
 
 const posStore = usePosStore()
@@ -16,6 +18,8 @@ const notificationStore = useNotificationStore()
 
 const showPaymentModal = ref(false)
 const showDiscountDialog = ref(false)
+const showHeldOrdersModal = ref(false)
+const showReturnModal = ref(false)
 const selectedCustomer = ref<any>(null)
 
 const cart = computed(() => posStore.currentCart)
@@ -41,6 +45,24 @@ const handleCheckout = () => {
     return
   }
   showPaymentModal.value = true
+}
+
+const handleSuspend = async () => {
+  if (!cart.value?.cartId || !posStore.hasItems) {
+    notificationStore.warning('Cart is empty', 'Cannot suspend an empty cart')
+    return
+  }
+  
+  try {
+    await posStore.holdOrder(cart.value.cartId, selectedCustomer.value?.id, 'Suspended by cashier')
+    selectedCustomer.value = null
+    // Create new cart immediately
+    const storeId = 1
+    const cashierId = Number(authStore.currentUser?.id) || 1
+    await posStore.createCart(storeId, cashierId)
+  } catch (error) {
+    // Error handled in store
+  }
 }
 
 const handlePaymentComplete = async (paymentData: any) => {
@@ -102,15 +124,32 @@ const handlePaymentComplete = async (paymentData: any) => {
           <i class="fas fa-percent text-blue-500"></i>
           <span>Discount</span>
         </button>
-        <button class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1">
+        <button 
+          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          @click="handleSuspend"
+          :disabled="!posStore.hasItems"
+        >
           <i class="fas fa-pause text-orange-500"></i>
           <span>Suspend</span>
         </button>
-        <button class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1">
-          <i class="fas fa-undo text-red-500"></i>
+        <button 
+          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          @click="showHeldOrdersModal = true"
+        >
+          <i class="fas fa-undo text-green-500"></i>
+          <span>Recall</span>
+        </button>
+        <button 
+          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          @click="showReturnModal = true"
+        >
+          <i class="fas fa-undo text-orange-500"></i>
           <span>Return</span>
         </button>
-        <button class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1">
+        <button 
+          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          @click="$router.push('/pos/sales')"
+        >
           <i class="fas fa-history text-purple-500"></i>
           <span>History</span>
         </button>
@@ -145,6 +184,23 @@ const handlePaymentComplete = async (paymentData: any) => {
       :is-open="showDiscountDialog"
       :cart-id="cart?.cartId || ''"
       @close="showDiscountDialog = false"
+    />
+
+    <HeldOrdersModal
+      :is-open="showHeldOrdersModal"
+      @close="showHeldOrdersModal = false"
+      @resume="(order) => { 
+        selectedCustomer = order.customer 
+        // Cart is already updated by store action
+      }"
+    />
+
+    <ReturnOrderModal
+      :is-open="showReturnModal"
+      @close="showReturnModal = false"
+      @return-processed="() => {
+        // Optional: Refresh or reload if needed
+      }"
     />
   </div>
 </template>

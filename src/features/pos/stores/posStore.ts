@@ -163,6 +163,90 @@ export const usePosStore = defineStore('pos', () => {
         }
     }
 
+    const holdOrder = async (cartId: string, customerId?: number, notes?: string) => {
+        isLoading.value = true
+        try {
+            const response = await apiService.post(`/pos/cart/${cartId}/hold`, { customerId, notes })
+            if (response.data.success) {
+                currentCart.value = null
+                notificationStore.success('Order Suspended', 'Order has been parked successfully')
+            }
+        } catch (error: any) {
+            notificationStore.error('Failed to suspend order', error.response?.data?.message || 'Unknown error')
+            throw error
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    const getHeldOrders = async (storeId: number) => {
+        isLoading.value = true
+        try {
+            const response = await apiService.get('/pos/orders/held', { params: { storeId } })
+            if (response.data.success) {
+                return response.data.data
+            }
+            return []
+        } catch (error: any) {
+            notificationStore.error('Failed to fetch held orders', error.response?.data?.message || 'Unknown error')
+            throw error
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    const resumeOrder = async (orderId: number) => {
+        isLoading.value = true
+        try {
+            const response = await apiService.post(`/pos/orders/${orderId}/resume`)
+            if (response.data.success) {
+                const order = response.data.data
+                // We need to create a new cart and populate it
+
+                // 1. Create Cart
+                const storeId = order.store.id
+                const cashierId = order.cashier.id
+                const cartResp = await apiService.post('/pos/cart', { storeId, cashierId })
+                const newCartId = cartResp.data.data.cartId
+
+                // 2. Add Items
+                for (const item of order.items) {
+                    await apiService.post(`/pos/cart/${newCartId}/items`, {
+                        productId: item.product.id,
+                        quantity: item.quantity
+                    })
+                }
+
+                // 3. Update current cart
+                const finalCartResp = await apiService.get(`/pos/cart/${newCartId}`)
+                currentCart.value = finalCartResp.data.data
+
+                notificationStore.success('Order Resumed', 'Order retrieved successfully')
+            }
+        } catch (error: any) {
+            notificationStore.error('Failed to resume order', error.response?.data?.message || 'Unknown error')
+            throw error
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    const processReturn = async (returnRequest: any) => {
+        isLoading.value = true
+        try {
+            const response = await apiService.post('/pos/returns', returnRequest)
+            if (response.data.success) {
+                notificationStore.success('Return Processed', 'Return has been processed successfully')
+                return response.data.data
+            }
+        } catch (error: any) {
+            notificationStore.error('Failed to process return', error.response?.data?.message || 'Unknown error')
+            throw error
+        } finally {
+            isLoading.value = false
+        }
+    }
+
     return {
         currentCart,
         isLoading,
@@ -178,6 +262,10 @@ export const usePosStore = defineStore('pos', () => {
         applyDiscount,
         removeDiscount,
         clearCart,
-        checkout
+        checkout,
+        holdOrder,
+        getHeldOrders,
+        resumeOrder,
+        processReturn
     }
 })
