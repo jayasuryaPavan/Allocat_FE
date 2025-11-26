@@ -55,10 +55,30 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'POS',
         component: () => import('@/features/pos/views/PosView.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
           permissions: ['orders:create']
+        }
+      },
+      {
+        path: 'sales',
+        name: 'SalesHistory',
+        component: () => import('@/features/pos/views/SalesHistoryView.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+          permissions: ['orders:read']
+        }
+      },
+      {
+        path: 'discounts',
+        name: 'DiscountManagement',
+        component: () => import('@/features/pos/views/DiscountManagementView.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+          permissions: ['discounts:manage']
         }
       }
     ]
@@ -71,7 +91,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'Products',
         component: () => import('@/features/products/views/ProductsView.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['INVENTORY_MANAGER', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
           permissions: ['products:read']
@@ -87,7 +107,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'Inventory',
         component: () => import('@/features/inventory/views/InventoryView.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['INVENTORY_MANAGER', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN', 'WAREHOUSE_STAFF'],
           permissions: ['inventory:read']
@@ -103,7 +123,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'Purchases',
         component: () => import('@/features/purchases/views/PurchasesView.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
           permissions: ['orders:read']
@@ -119,7 +139,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'Customers',
         component: () => import('@/features/customers/views/CustomersView.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN', 'VIEWER'],
           permissions: ['customers:read']
@@ -135,7 +155,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'Reports',
         component: () => import('@/features/reports/views/ReportsView.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['STORE_MANAGER', 'ACCOUNTANT', 'ADMIN', 'SUPER_ADMIN'],
           permissions: ['reports:view']
@@ -151,7 +171,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'Admin',
         component: () => import('@/features/admin/views/AdminView.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['ADMIN', 'SUPER_ADMIN'],
           permissions: ['users:read']

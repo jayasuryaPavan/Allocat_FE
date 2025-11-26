@@ -68,25 +68,33 @@ export class ApiService {
 
         loadingStore.stopLoading()
 
+        const originalRequest = error.config
+
         // Handle 401 Unauthorized
         if (error.response?.status === 401) {
-          // Try to refresh token
-          try {
-            await authStore.refreshToken()
-            // Retry the original request
-            const originalRequest = error.config
-            if (originalRequest && !originalRequest._retry) {
-              originalRequest._retry = true
-              const token = authStore.getToken()
-              if (token) {
-                originalRequest.headers.Authorization = `Bearer ${token}`
-              }
-              return this.axiosInstance(originalRequest)
-            }
-          } catch (refreshError) {
-            // Refresh failed, logout user
+          // Skip refresh for the refresh endpoint itself to avoid infinite loop
+          if (originalRequest?.url?.includes('/auth/refresh')) {
+            console.error('Refresh token expired or invalid')
             authStore.logout()
-            return Promise.reject(refreshError)
+            return Promise.reject(error)
+          }
+
+          // Try to refresh token only once per request
+          if (originalRequest && !originalRequest._retry) {
+            originalRequest._retry = true
+            
+            try {
+              const newToken = await authStore.refreshToken()
+              // Update the authorization header with the new token
+              originalRequest.headers.Authorization = `Bearer ${newToken}`
+              // Retry the original request
+              return this.axiosInstance(originalRequest)
+            } catch (refreshError) {
+              // Refresh failed, logout user
+              console.error('Token refresh failed:', refreshError)
+              authStore.logout()
+              return Promise.reject(refreshError)
+            }
           }
         }
 

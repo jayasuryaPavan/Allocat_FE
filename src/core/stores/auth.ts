@@ -182,29 +182,52 @@ export const useAuthStore = defineStore('auth', () => {
     const refreshTok = getRefreshToken()
     
     if (!refreshTok) {
-      logout()
+      console.error('No refresh token available')
+      await logout()
       throw new Error('No refresh token available')
     }
 
     try {
-      // Send Authorization: Bearer {refreshToken}
+      console.log('Attempting to refresh token...')
+      // Use the axios instance directly to bypass the regular interceptor
       const axios = apiService.getAxiosInstance()
       const resp = await axios.post('/auth/refresh', undefined, {
-        headers: { Authorization: `Bearer ${refreshTok}` }
-      })
+        headers: { 
+          Authorization: `Bearer ${refreshTok}`,
+          'Content-Type': 'application/json'
+        },
+        // Skip the retry flag to prevent interceptor from interfering
+        skipAuthRefresh: true
+      } as any)
+      
       const apiResp = resp.data
+      console.log('Refresh response:', apiResp)
+      
       if (!apiResp?.success) {
         throw new Error(apiResp?.error || 'Failed to refresh token')
       }
+      
       const data = apiResp.data
       const newToken = data.accessToken
 
+      if (!newToken) {
+        throw new Error('No access token in refresh response')
+      }
+
       setToken(newToken)
+      
+      // Update refresh token if provided
+      if (data.refreshToken) {
+        setRefreshToken(data.refreshToken)
+      }
+      
       startTokenRefreshTimer()
+      console.log('Token refreshed successfully')
       
       return newToken
-    } catch (error) {
-      logout()
+    } catch (error: any) {
+      console.error('Token refresh failed:', error.response?.data || error.message)
+      await logout()
       throw error
     }
   }
