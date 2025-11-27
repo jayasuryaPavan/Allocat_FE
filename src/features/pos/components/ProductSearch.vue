@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useApiService } from '@/core/services/api'
 import { useNotificationStore } from '@/core/stores/notification'
 import { usePosStore } from '../stores/posStore'
@@ -103,6 +103,12 @@ const closeResults = (e: Event) => {
     showResults.value = false
   }, 200)
 }
+
+const handleFocus = () => {
+  if (searchResults.value.length > 0) {
+    showResults.value = true
+  }
+}
 </script>
 
 <template>
@@ -120,7 +126,7 @@ const closeResults = (e: Event) => {
         @input="handleSearch"
         @keydown.enter.prevent="handleEnter"
         @blur="closeResults"
-        @focus="if(searchResults.length > 0) showResults = true"
+        @focus="handleFocus"
       />
       <div v-if="isLoading" class="absolute inset-y-0 right-0 pr-3 flex items-center">
         <i class="fas fa-spinner fa-spin text-blue-500"></i>

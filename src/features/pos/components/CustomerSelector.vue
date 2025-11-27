@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useApiService } from '@/core/services/api'
 
 const props = defineProps<{
@@ -44,6 +44,12 @@ const handleSearch = () => {
       isLoading.value = false
     }
   }, 300)
+}
+
+const handleFocus = () => {
+  if (searchResults.value.length > 0) {
+    showResults.value = true
+  }
 }
 
 const selectCustomer = (customer: any) => {
@@ -93,7 +99,7 @@ const closeResults = () => {
         placeholder="Search customer..."
         @input="handleSearch"
         @blur="closeResults"
-        @focus="if(searchResults.length > 0) showResults = true"
+        @focus="handleFocus"
       />
       <div v-if="isLoading" class="absolute inset-y-0 right-0 pr-3 flex items-center">
         <i class="fas fa-spinner fa-spin text-blue-500"></i>

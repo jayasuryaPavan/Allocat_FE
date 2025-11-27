@@ -171,7 +171,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { InventoryApiService } from '@/core/services/inventoryApi'
+import { productsApiService } from '@/core/services/productsApi'
 import type { Product } from '@/core/types/inventory'
 
 // State
@@ -194,7 +194,7 @@ let searchTimeout: NodeJS.Timeout
 const fetchProducts = async () => {
   loading.value = true
   try {
-    const response = await InventoryApiService.getAllProducts({
+    const response = await productsApiService.getAllProducts({
       page: currentPage.value,
       size: pageSize.value,
       search: searchTerm.value || undefined,
@@ -242,7 +242,7 @@ const handleSort = (field: string) => {
 // Fetch categories
 const fetchCategories = async () => {
   try {
-    const response = await InventoryApiService.getCategories()
+    const response = await productsApiService.getCategories()
     if (response.success && response.data) {
       categories.value = response.data
     }

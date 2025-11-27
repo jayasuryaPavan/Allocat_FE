@@ -158,10 +158,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAnalyticsStore } from '../stores/analyticsStore'
-import { useAuthStore } from '@/core/stores/auth'
 
 const analyticsStore = useAnalyticsStore()
-const authStore = useAuthStore()
 
 const startDate = ref(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
 const endDate = ref(new Date().toISOString().split('T')[0])

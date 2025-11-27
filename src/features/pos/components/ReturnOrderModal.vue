@@ -165,7 +165,7 @@ import { useApiService } from '@/core/services/api'
 import { useAuthStore } from '@/core/stores/auth'
 import type { SalesOrder, SalesOrderItem } from '../types'
 
-const props = defineProps<{
+defineProps<{
   isOpen: boolean
 }>()
 

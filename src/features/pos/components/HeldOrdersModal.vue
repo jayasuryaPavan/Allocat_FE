@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { usePosStore } from '../stores/posStore'
-import { useAuthStore } from '@/core/stores/auth'
 import type { SalesOrder } from '../types'
 
 const props = defineProps<{
@@ -14,7 +13,6 @@ const emit = defineEmits<{
 }>()
 
 const posStore = usePosStore()
-const authStore = useAuthStore()
 const heldOrders = ref<SalesOrder[]>([])
 const isLoading = ref(false)
 
