@@ -29,7 +29,24 @@ onMounted(async () => {
   if (!posStore.currentCart) {
     const storeId = 1 // Default store ID for now
     const cashierId = Number(authStore.currentUser?.id) || 1
-    await posStore.createCart(storeId, cashierId)
+    
+    // Run diagnostics if in development mode
+    if (import.meta.env.DEV) {
+      try {
+        const { runApiDiagnostics, printDiagnostics } = await import('@/utils/apiDiagnostics')
+        const diagnostics = await runApiDiagnostics()
+        printDiagnostics(diagnostics)
+      } catch (error) {
+        console.warn('Failed to run diagnostics:', error)
+      }
+    }
+    
+    try {
+      await posStore.createCart(storeId, cashierId)
+    } catch (error: any) {
+      // Error is already handled in posStore with notification
+      console.error('Failed to create cart on mount:', error)
+    }
   }
 })
 

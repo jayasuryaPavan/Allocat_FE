@@ -212,7 +212,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'Stores',
-        component: () => import('@features/admin/views/StoresView.vue'),
+        component: () => import('@/features/admin/views/StoresView.vue'),
         meta: {
           requiresAuth: true,
           roles: ['SUPER_ADMIN']
