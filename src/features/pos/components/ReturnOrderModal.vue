@@ -1,12 +1,15 @@
 <template>
   <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-      <!-- Header -->
-      <div class="flex items-center justify-between p-4 border-b">
-        <h2 class="text-xl font-semibold text-gray-800">Process Return</h2>
-        <button @click="close" class="text-gray-500 hover:text-gray-700">
-          <i class="fas fa-times text-xl"></i>
+      <!-- Header with Back Button -->
+      <div class="flex items-center p-4 border-b border-gray-200">
+        <button
+          @click="close"
+          class="touch-button min-w-[56px] min-h-[56px] mr-3 flex items-center justify-center text-gray-600 hover:text-gray-900 active:text-gray-700 active:bg-gray-100 rounded-lg transition-all touch-no-select"
+        >
+          <i class="fas fa-arrow-left text-2xl"></i>
         </button>
+        <h2 class="text-2xl font-bold text-gray-800 flex-1">Process Return</h2>
       </div>
 
       <!-- Content -->
@@ -19,13 +22,13 @@
               v-model="searchQuery" 
               type="text" 
               placeholder="Enter Order Number (e.g., S001-2023...)" 
-              class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              class="touch-input flex-1 px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium"
               @keyup.enter="searchOrder"
             />
             <button 
               @click="searchOrder"
               :disabled="isLoading || !searchQuery"
-              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              class="touch-button min-h-[56px] px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 active:bg-blue-800 active:scale-95 disabled:opacity-50 transition-all touch-no-select"
             >
               <i class="fas fa-search mr-2"></i>
               Search
@@ -86,15 +89,15 @@
                       <div class="flex items-center justify-center gap-2">
                         <button 
                           @click="decrementReturnQty(item)"
-                          class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                          class="touch-button min-w-[48px] min-h-[48px] rounded-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 flex items-center justify-center text-gray-600 text-lg font-bold transition-all touch-no-select"
                           :disabled="getReturnQty(item.id) <= 0"
                         >
                           -
                         </button>
-                        <span class="w-8 text-center font-medium">{{ getReturnQty(item.id) }}</span>
+                        <span class="w-12 text-center font-semibold text-lg">{{ getReturnQty(item.id) }}</span>
                         <button 
                           @click="incrementReturnQty(item)"
-                          class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                          class="touch-button min-w-[48px] min-h-[48px] rounded-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 flex items-center justify-center text-gray-600 text-lg font-bold transition-all touch-no-select"
                           :disabled="getReturnQty(item.id) >= item.quantity"
                         >
                           +
@@ -124,7 +127,7 @@
             <textarea 
               v-model="returnReason"
               rows="3"
-              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              class="touch-input w-full px-4 py-3 text-base border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium"
               placeholder="Why is the customer returning these items?"
             ></textarea>
           </div>
@@ -138,19 +141,13 @@
       </div>
 
       <!-- Footer -->
-      <div class="p-4 border-t bg-gray-50 flex justify-end gap-3">
-        <button 
-          @click="close"
-          class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
-        >
-          Cancel
-        </button>
+      <div class="p-6 border-t bg-gray-50 flex justify-end gap-4">
         <button 
           @click="submitReturn"
           :disabled="isLoading || !canSubmit"
-          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium flex items-center"
+          class="touch-button pos-touch-target px-8 py-4 bg-blue-600 text-white text-xl font-bold rounded-xl hover:bg-blue-700 active:bg-blue-800 active:scale-95 disabled:opacity-50 transition-all touch-no-select flex items-center"
         >
-          <i v-if="isLoading" class="fas fa-spinner fa-spin mr-2"></i>
+          <i v-if="isLoading" class="fas fa-spinner fa-spin mr-3 text-xl"></i>
           Process Return
         </button>
       </div>

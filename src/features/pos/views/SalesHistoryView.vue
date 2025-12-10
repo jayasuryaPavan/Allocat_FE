@@ -1,19 +1,81 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSalesStore } from '../stores/salesStore'
-import { OrderStatus, PaymentStatus } from '../types'
+import { salesApiService } from '@/core/services/salesApi'
+import { StoresApiService } from '@/core/services/storesApi'
+import { useNotificationStore } from '@/core/stores/notification'
+import { OrderStatus } from '../types'
+
+const router = useRouter()
+const notificationStore = useNotificationStore()
 
 const salesStore = useSalesStore()
 const currentPage = ref(0)
 const pageSize = ref(10)
 const searchOrderNo = ref('')
+const storeId = ref<number | null>(null)
+
+// Get store ID from store code in localStorage
+const getStoreId = async (): Promise<number> => {
+  if (storeId.value) {
+    return storeId.value
+  }
+  
+  try {
+    const storeCode = localStorage.getItem('active_store_code')
+    if (storeCode) {
+      const response = await StoresApiService.getByCode(storeCode)
+      if (response.success && response.data) {
+        storeId.value = response.data.id
+        return response.data.id
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to get store from code, using default store ID 1', error)
+  }
+  
+  // Default to store ID 1 if store code lookup fails
+  storeId.value = 1
+  return 1
+}
 
 const loadOrders = async () => {
+  const id = await getStoreId()
+  
+  // If searching by order number, use the specific endpoint
+  if (searchOrderNo.value && searchOrderNo.value.trim()) {
+    try {
+      const response = await salesApiService.getOrderByOrderNo(searchOrderNo.value.trim())
+      if (response.success && response.data) {
+        salesStore.orders = [response.data]
+        salesStore.totalOrders = 1
+      } else {
+        salesStore.orders = []
+        salesStore.totalOrders = 0
+        notificationStore.warning('Order not found', response.message || 'No order found with that number')
+      }
+    } catch (error: any) {
+      salesStore.orders = []
+      salesStore.totalOrders = 0
+      notificationStore.error('Search failed', error.response?.data?.message || 'Failed to search order')
+    }
+    return
+  }
+  
+  // Calculate date range (default to today)
+  const today = new Date()
+  const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
+  const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
+  
   await salesStore.fetchOrders({
+    storeId: id,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
     page: currentPage.value,
     size: pageSize.value,
-    sort: 'createdAt,desc',
-    orderNo: searchOrderNo.value || undefined
+    sortBy: 'orderDate',
+    sortDirection: 'desc'
   })
 }
 
@@ -23,6 +85,10 @@ onMounted(() => {
 
 const handleSearch = () => {
   currentPage.value = 0
+  if (searchOrderNo.value && searchOrderNo.value.trim()) {
+    // Reset to show all orders if search is cleared
+    searchOrderNo.value = ''
+  }
   loadOrders()
 }
 
@@ -52,7 +118,13 @@ const viewDetails = (orderId: number) => {
 <template>
   <div class="space-y-6">
     <div class="md:flex md:items-center md:justify-between">
-      <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-4 flex-1 min-w-0">
+        <button
+          @click="router.push('/pos')"
+          class="touch-button min-w-[56px] min-h-[56px] flex items-center justify-center text-gray-600 hover:text-gray-900 active:text-gray-700 active:bg-gray-100 rounded-lg transition-all touch-no-select"
+        >
+          <i class="fas fa-arrow-left text-2xl"></i>
+        </button>
         <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
           Sales History
         </h2>
@@ -120,8 +192,8 @@ const viewDetails = (orderId: number) => {
                     {{ formatDate(order.orderDate) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ order.customerId ? `Customer #${order.customerId}` : 'Walk-in' }}
-                  </td>
+  {{ order.customer?.id ? `Customer #${order.customer.id}` : 'Walk-in' }}
+</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                     {{ formatCurrency(order.total) }}
                   </td>

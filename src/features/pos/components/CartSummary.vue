@@ -47,7 +47,7 @@ const handleClearCart = () => {
       </h3>
       <button 
         v-if="items.length > 0"
-        class="text-sm text-red-500 hover:text-red-700 font-medium"
+        class="touch-button min-h-[48px] px-4 py-2 text-base text-red-500 hover:text-red-700 active:text-red-800 active:bg-red-50 font-semibold rounded-lg transition-all touch-no-select"
         @click="handleClearCart"
       >
         Clear All
@@ -57,9 +57,9 @@ const handleClearCart = () => {
     <!-- Cart Items List -->
     <div class="flex-1 overflow-y-auto min-h-0">
       <div v-if="items.length === 0" class="h-full flex flex-col items-center justify-center text-gray-400 p-8">
-        <i class="fas fa-shopping-basket text-6xl mb-4 opacity-20"></i>
-        <p class="text-lg">Cart is empty</p>
-        <p class="text-sm">Scan a product or search to add items</p>
+        <i class="fas fa-shopping-basket text-8xl mb-6 opacity-20"></i>
+        <p class="text-2xl font-semibold mb-2">Cart is empty</p>
+        <p class="text-lg">Scan a product or search to add items</p>
       </div>
       <div v-else>
         <CartItem 
@@ -74,20 +74,20 @@ const handleClearCart = () => {
 
     <!-- Footer / Totals -->
     <div class="p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-      <div class="space-y-2 mb-4">
-        <div class="flex justify-between text-sm text-gray-600">
-          <span>Subtotal</span>
-          <span>{{ formatCurrency(subtotal) }}</span>
+      <div class="space-y-3 mb-6">
+        <div class="flex justify-between text-lg text-gray-600">
+          <span class="font-medium">Subtotal</span>
+          <span class="font-semibold">{{ formatCurrency(subtotal) }}</span>
         </div>
-        <div class="flex justify-between text-sm text-gray-600">
-          <span>Tax</span>
-          <span>{{ formatCurrency(tax) }}</span>
+        <div class="flex justify-between text-lg text-gray-600">
+          <span class="font-medium">Tax</span>
+          <span class="font-semibold">{{ formatCurrency(tax) }}</span>
         </div>
-        <div v-if="discount > 0" class="flex justify-between text-sm text-green-600 font-medium">
+        <div v-if="discount > 0" class="flex justify-between text-lg text-green-600 font-semibold">
           <span>Discount</span>
           <span>-{{ formatCurrency(discount) }}</span>
         </div>
-        <div class="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t border-gray-200">
+        <div class="flex justify-between text-3xl font-bold text-gray-900 pt-3 border-t-2 border-gray-300">
           <span>Total</span>
           <span>{{ formatCurrency(total) }}</span>
         </div>

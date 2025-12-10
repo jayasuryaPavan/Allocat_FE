@@ -35,12 +35,21 @@ const applyDiscount = async () => {
       <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
       <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <!-- Header with Back Button -->
+        <div class="bg-white px-4 pt-4 pb-2 border-b border-gray-200 flex items-center">
+          <button
+            @click="$emit('close')"
+            class="touch-button min-w-[56px] min-h-[56px] mr-3 flex items-center justify-center text-gray-600 hover:text-gray-900 active:text-gray-700 active:bg-gray-100 rounded-lg transition-all touch-no-select"
+          >
+            <i class="fas fa-arrow-left text-2xl"></i>
+          </button>
+          <h3 class="text-xl font-semibold text-gray-900 flex-1" id="modal-title">
+            Apply Discount
+          </h3>
+        </div>
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                Apply Discount
-              </h3>
               <div class="mt-2">
                 <p class="text-sm text-gray-500 mb-4">
                   Enter a discount code to apply to the current cart.
@@ -49,7 +58,7 @@ const applyDiscount = async () => {
                   <input
                     type="text"
                     v-model="discountCode"
-                    class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                    class="touch-input shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full text-lg border-2 border-gray-300 rounded-xl p-3 font-medium"
                     placeholder="Enter code (e.g. SAVE10)"
                     @keydown.enter.prevent="applyDiscount"
                   />
@@ -61,22 +70,15 @@ const applyDiscount = async () => {
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <div class="bg-gray-50 px-6 py-4 sm:px-6 sm:flex sm:flex-row-reverse gap-3">
           <button
             type="button"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+            class="touch-button pos-touch-target w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-4 bg-blue-600 text-xl font-bold text-white hover:bg-blue-700 active:bg-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto disabled:opacity-50 transition-all touch-no-select"
             :disabled="!discountCode || posStore.isLoading"
             @click="applyDiscount"
           >
-            <i v-if="posStore.isLoading" class="fas fa-spinner fa-spin mr-2"></i>
-            Apply
-          </button>
-          <button
-            type="button"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-            @click="$emit('close')"
-          >
-            Cancel
+            <i v-if="posStore.isLoading" class="fas fa-spinner fa-spin mr-3 text-xl"></i>
+            <span>Apply</span>
           </button>
         </div>
       </div>

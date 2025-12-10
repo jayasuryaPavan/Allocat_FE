@@ -41,52 +41,52 @@ const updateQuantity = (event: Event) => {
 </script>
 
 <template>
-  <div class="flex items-center justify-between p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-    <div class="flex-1 min-w-0">
-      <h4 class="text-sm font-medium text-gray-900 truncate">{{ item.productName }}</h4>
-      <p class="text-xs text-gray-500">{{ item.sku }}</p>
-      <div class="mt-1 text-xs text-gray-500">
+  <div class="flex items-center justify-between p-4 border-b-2 border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors touch-no-select">
+    <div class="flex-1 min-w-0 pr-4">
+      <h4 class="text-lg font-semibold text-gray-900 truncate">{{ item.productName }}</h4>
+      <p class="text-sm text-gray-500 mt-1">{{ item.sku }}</p>
+      <div class="mt-2 text-sm text-gray-600 font-medium">
         {{ formattedPrice }} x {{ item.quantity }}
       </div>
     </div>
     
-    <div class="flex items-center space-x-3">
-      <!-- Quantity Controls -->
-      <div class="flex items-center border border-gray-300 rounded-md">
+    <div class="flex items-center gap-4">
+      <!-- Quantity Controls - Touch Optimized -->
+      <div class="flex items-center border-2 border-gray-300 rounded-xl overflow-hidden shadow-sm">
         <button 
-          class="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-l-md focus:outline-none"
+          class="touch-button min-w-[56px] min-h-[56px] bg-gray-100 active:bg-gray-200 text-gray-700 hover:bg-gray-150 focus:outline-none flex items-center justify-center transition-all"
           @click="decreaseQuantity"
         >
-          <i class="fas fa-minus text-xs"></i>
+          <i class="fas fa-minus text-lg font-bold"></i>
         </button>
         <input 
           type="number" 
-          class="w-10 text-center text-sm border-none focus:ring-0 p-1 appearance-none"
+          class="touch-input w-16 text-center text-lg font-semibold border-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
           :value="item.quantity"
           @change="updateQuantity"
         />
         <button 
-          class="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-r-md focus:outline-none"
+          class="touch-button min-w-[56px] min-h-[56px] bg-gray-100 active:bg-gray-200 text-gray-700 hover:bg-gray-150 focus:outline-none flex items-center justify-center transition-all"
           @click="increaseQuantity"
         >
-          <i class="fas fa-plus text-xs"></i>
+          <i class="fas fa-plus text-lg font-bold"></i>
         </button>
       </div>
       
       <!-- Total -->
-      <div class="text-right min-w-[80px]">
-        <div class="text-sm font-bold text-gray-900">{{ formattedTotal }}</div>
-        <div v-if="item.discount > 0" class="text-xs text-green-600">
+      <div class="text-right min-w-[100px]">
+        <div class="text-lg font-bold text-gray-900">{{ formattedTotal }}</div>
+        <div v-if="item.discount > 0" class="text-sm text-green-600 font-medium">
           -{{ item.discount.toFixed(2) }}
         </div>
       </div>
       
-      <!-- Remove Button -->
+      <!-- Remove Button - Touch Optimized -->
       <button 
-        class="text-gray-400 hover:text-red-500 focus:outline-none ml-2"
+        class="touch-button min-w-[56px] min-h-[56px] text-red-400 hover:text-red-600 active:text-red-700 active:bg-red-50 focus:outline-none rounded-lg transition-all flex items-center justify-center"
         @click="$emit('remove', item.itemId)"
       >
-        <i class="fas fa-trash-alt"></i>
+        <i class="fas fa-trash-alt text-xl"></i>
       </button>
     </div>
   </div>

@@ -28,9 +28,9 @@
         v-if="!collapsed"
         @click="$emit('toggle')"
         title="Collapse sidebar"
-        class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+        class="touch-button p-3 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-all active:bg-gray-200 flex-shrink-0 mr-2"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
         </svg>
       </button>
@@ -40,9 +40,9 @@
         v-if="collapsed"
         @click="$emit('toggle')"
         title="Expand sidebar"
-        class="absolute bottom-1 right-1 p-1.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        class="absolute bottom-0 right-0 p-2 m-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:bg-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
         </svg>
       </button>
@@ -55,20 +55,20 @@
           :to="item.href"
           :title="collapsed ? item.name : ''"
           :class="[
-            'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200',
-            collapsed ? 'justify-center' : '',
+            'group flex items-center px-4 py-3.5 text-base font-medium rounded-xl transition-all duration-200 mb-1 touch-no-select active:scale-98',
+            collapsed ? 'justify-center mx-2' : 'mx-3',
             isActiveRoute(item.href)
-              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
-              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
+              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200 shadow-sm'
+              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white active:bg-gray-200'
           ]"
         >
           <component
             :is="item.icon"
             :class="[
-              'flex-shrink-0 w-5 h-5',
+              'flex-shrink-0 w-6 h-6 transition-colors',
               isActiveRoute(item.href)
-                ? 'text-blue-500 dark:text-blue-400'
-                : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+                ? 'text-blue-600 dark:text-blue-400'
+                : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
             ]"
           />
           <span v-if="!collapsed" class="ml-3 truncate">{{ item.name }}</span>

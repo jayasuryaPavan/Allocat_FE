@@ -30,6 +30,83 @@ export enum DiscountType {
     BUY_X_GET_Y = 'BUY_X_GET_Y'
 }
 
+export enum ShiftStatus {
+    PENDING = 'PENDING',
+    ACTIVE = 'ACTIVE',
+    COMPLETED = 'COMPLETED',
+    CANCELLED = 'CANCELLED'
+}
+
+export enum ShiftSwapStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    MANAGER_APPROVED = 'MANAGER_APPROVED',
+    REJECTED = 'REJECTED',
+    CANCELLED = 'CANCELLED'
+}
+
+export enum SalesPersonLoginType {
+    SHIFT_START = 'SHIFT_START',
+    BREAK_RETURN = 'BREAK_RETURN',
+    SHIFT_END = 'SHIFT_END',
+    DAY_END = 'DAY_END'
+}
+
+export interface Shift {
+    id: number
+    storeId: number
+    userId: number
+    userName?: string
+    shiftDate: string
+    startedAt?: string
+    endedAt?: string
+    expectedStartTime?: string
+    expectedEndTime?: string
+    startingCashAmount?: number
+    endingCashAmount?: number
+    expectedCashAmount?: number
+    cashDifference?: number
+    status: ShiftStatus
+    notes?: string
+    endedBy?: number
+    createdAt?: string
+}
+
+export interface ShiftSwap {
+    id: number
+    storeId: number
+    originalShiftId: number
+    requestedByUserId: number
+    requestedToUserId: number
+    requestedByName?: string
+    requestedToName?: string
+    originalShiftDate: string
+    swapShiftDate: string
+    status: ShiftSwapStatus
+    reason?: string
+    managerNotes?: string
+    approvedBy?: number
+    rejectedBy?: number
+    approvedAt?: string
+    rejectedAt?: string
+    createdAt?: string
+}
+
+export interface SalesPersonLogin {
+    id: number
+    storeId: number
+    userId: number
+    userName?: string
+    shiftId?: number
+    loginTime: string
+    logoutTime?: string
+    loginType: SalesPersonLoginType
+    deviceInfo?: string
+    ipAddress?: string
+    location?: string
+    createdAt?: string
+}
+
 export interface Discount {
     id: number;
     code: string;

@@ -83,19 +83,19 @@ const closeResults = () => {
           <div class="text-xs text-blue-700">{{ modelValue.phone || modelValue.email }}</div>
         </div>
       </div>
-      <button @click="clearSelection" class="text-blue-400 hover:text-blue-600 focus:outline-none">
-        <i class="fas fa-times"></i>
+      <button @click="clearSelection" class="touch-button min-w-[48px] min-h-[48px] text-blue-400 hover:text-blue-600 active:text-blue-700 active:bg-blue-50 focus:outline-none rounded-lg transition-all flex items-center justify-center">
+        <i class="fas fa-times text-xl"></i>
       </button>
     </div>
 
     <div v-else class="relative">
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <i class="fas fa-user text-gray-400"></i>
+      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <i class="fas fa-user text-gray-400 text-xl"></i>
       </div>
       <input
         type="text"
         v-model="searchQuery"
-        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm transition duration-150 ease-in-out"
+        class="touch-input block w-full pl-12 pr-4 border-2 border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-lg font-medium transition duration-150 ease-in-out"
         placeholder="Search customer..."
         @input="handleSearch"
         @blur="closeResults"
@@ -114,8 +114,9 @@ const closeResults = () => {
           <li
             v-for="customer in searchResults"
             :key="customer.id"
-            class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 cursor-pointer"
+            class="text-gray-900 cursor-default select-none relative py-4 px-4 hover:bg-blue-50 active:bg-blue-100 cursor-pointer touch-no-select border-b border-gray-100 last:border-b-0 transition-colors"
             @mousedown.prevent="selectCustomer(customer)"
+            @touchstart.prevent="selectCustomer(customer)"
           >
             <div class="flex items-center">
               <div class="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs font-bold mr-2">

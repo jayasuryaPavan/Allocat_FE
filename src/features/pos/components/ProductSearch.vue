@@ -114,14 +114,14 @@ const handleFocus = () => {
 <template>
   <div class="relative w-full">
     <div class="relative">
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <i class="fas fa-search text-gray-400"></i>
+      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <i class="fas fa-search text-gray-400 text-xl"></i>
       </div>
       <input
         ref="searchInput"
         v-model="searchQuery"
         type="text"
-        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm transition duration-150 ease-in-out"
+        class="touch-input block w-full pl-12 pr-4 border-2 border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-lg font-medium transition duration-150 ease-in-out"
         placeholder="Scan barcode or search product..."
         @input="handleSearch"
         @keydown.enter.prevent="handleEnter"
@@ -142,18 +142,19 @@ const handleFocus = () => {
         <li
           v-for="product in searchResults"
           :key="product.id"
-          class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 cursor-pointer"
+          class="text-gray-900 cursor-default select-none relative py-4 px-4 hover:bg-blue-50 active:bg-blue-100 cursor-pointer touch-no-select border-b border-gray-100 last:border-b-0 transition-colors"
           @mousedown.prevent="selectProduct(product)"
+          @touchstart.prevent="selectProduct(product)"
         >
           <div class="flex justify-between items-center">
-            <div>
-              <span class="font-medium block truncate">{{ product.name }}</span>
-              <span class="text-gray-500 text-xs">{{ product.productCode }} | {{ product.barcode || 'No Barcode' }}</span>
+            <div class="flex-1 min-w-0">
+              <span class="font-semibold text-base block truncate">{{ product.name }}</span>
+              <span class="text-gray-500 text-sm mt-1 block">{{ product.productCode }} | {{ product.barcode || 'No Barcode' }}</span>
             </div>
-            <div class="text-right">
-              <span class="font-bold text-blue-600 block">{{ product.unitPrice?.toFixed(2) }}</span>
+            <div class="text-right ml-4">
+              <span class="font-bold text-blue-600 text-lg block">{{ product.unitPrice?.toFixed(2) }}</span>
               <span 
-                class="text-xs"
+                class="text-sm font-medium"
                 :class="product.availableQuantity > 0 ? 'text-green-600' : 'text-red-600'"
               >
                 {{ product.availableQuantity > 0 ? `${product.availableQuantity} in stock` : 'Out of stock' }}

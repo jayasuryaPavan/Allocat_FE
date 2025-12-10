@@ -66,61 +66,70 @@ const addAmount = (amount: number) => {
       <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
       <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <!-- Header with Back Button -->
+        <div class="bg-white px-4 pt-4 pb-2 border-b border-gray-200 flex items-center">
+          <button
+            @click="$emit('close')"
+            class="touch-button min-w-[56px] min-h-[56px] mr-3 flex items-center justify-center text-gray-600 hover:text-gray-900 active:text-gray-700 active:bg-gray-100 rounded-lg transition-all touch-no-select"
+          >
+            <i class="fas fa-arrow-left text-2xl"></i>
+          </button>
+          <h3 class="text-xl font-semibold text-gray-900 flex-1" id="modal-title">
+            Complete Payment
+          </h3>
+        </div>
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                Complete Payment
-              </h3>
               
               <div class="mt-4">
-                <div class="text-3xl font-bold text-center text-gray-900 mb-6">
+                <div class="text-5xl font-bold text-center text-gray-900 mb-8">
                   {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalAmount) }}
                 </div>
 
-                <!-- Payment Methods -->
-                <div class="grid grid-cols-2 gap-3 mb-6">
+                <!-- Payment Methods - Touch Optimized -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
                   <button
                     v-for="method in paymentMethods"
                     :key="method.id"
-                    class="flex items-center justify-center p-3 border rounded-md transition-colors"
-                    :class="paymentMethod === method.id ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-gray-300 hover:bg-gray-50'"
+                    class="touch-button pos-touch-target flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all active:scale-95 touch-no-select"
+                    :class="paymentMethod === method.id ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-md' : 'border-gray-300 hover:bg-gray-50 active:bg-gray-100'"
                     @click="paymentMethod = method.id"
                   >
-                    <i class="fas mr-2" :class="method.icon"></i>
-                    {{ method.label }}
+                    <i class="fas mb-2 text-2xl" :class="method.icon"></i>
+                    <span class="text-base font-semibold">{{ method.label }}</span>
                   </button>
                 </div>
 
                 <!-- Cash Payment Details -->
                 <div v-if="paymentMethod === PaymentType.CASH" class="space-y-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Amount Tendered</label>
-                    <div class="mt-1 relative rounded-md shadow-sm">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-500 sm:text-sm">$</span>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Amount Tendered</label>
+                    <div class="mt-2 relative rounded-xl shadow-md">
+                      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span class="text-gray-500 text-xl font-semibold">$</span>
                       </div>
                       <input
                         type="number"
                         v-model="amountTendered"
-                        class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 sm:text-lg border-gray-300 rounded-md py-2"
+                        class="touch-input focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-4 text-2xl font-bold border-2 border-gray-300 rounded-xl py-3"
                         placeholder="0.00"
                       />
                     </div>
                   </div>
 
-                  <!-- Quick Cash Buttons -->
-                  <div class="flex space-x-2">
-                    <button @click="setExactAmount" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">Exact</button>
-                    <button @click="addAmount(10)" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">+$10</button>
-                    <button @click="addAmount(20)" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">+$20</button>
-                    <button @click="addAmount(50)" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">+$50</button>
+                  <!-- Quick Cash Buttons - Touch Optimized -->
+                  <div class="grid grid-cols-4 gap-3 mt-4">
+                    <button @click="setExactAmount" class="touch-button min-h-[56px] bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 text-base font-semibold rounded-xl transition-all touch-no-select">Exact</button>
+                    <button @click="addAmount(10)" class="touch-button min-h-[56px] bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 text-base font-semibold rounded-xl transition-all touch-no-select">+$10</button>
+                    <button @click="addAmount(20)" class="touch-button min-h-[56px] bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 text-base font-semibold rounded-xl transition-all touch-no-select">+$20</button>
+                    <button @click="addAmount(50)" class="touch-button min-h-[56px] bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 text-base font-semibold rounded-xl transition-all touch-no-select">+$50</button>
                   </div>
 
-                  <div class="bg-gray-50 p-3 rounded-md">
-                    <div class="flex justify-between text-sm">
-                      <span class="font-medium text-gray-700">Change Due:</span>
-                      <span class="font-bold text-gray-900" :class="{'text-red-600': changeDue < 0}">
+                  <div class="bg-gray-50 p-4 rounded-xl border-2 border-gray-200 mt-4">
+                    <div class="flex justify-between items-center">
+                      <span class="text-lg font-semibold text-gray-700">Change Due:</span>
+                      <span class="text-2xl font-bold" :class="changeDue < 0 ? 'text-red-600' : 'text-gray-900'">
                         {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(changeDue) }}
                       </span>
                     </div>
@@ -128,31 +137,31 @@ const addAmount = (amount: number) => {
                 </div>
 
                 <!-- Notes -->
-                <div class="mt-4">
-                  <label class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                <div class="mt-6">
+                  <label class="block text-lg font-semibold text-gray-700 mb-2">Notes (Optional)</label>
                   <textarea
                     v-model="notes"
-                    rows="2"
-                    class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
+                    rows="3"
+                    class="touch-input shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full text-base border-2 border-gray-300 rounded-xl p-3"
                   ></textarea>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <div class="bg-gray-50 px-6 py-4 sm:px-6 sm:flex sm:flex-row-reverse gap-3">
           <button
             type="button"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            class="touch-button pos-touch-target w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-4 bg-blue-600 text-xl font-bold text-white hover:bg-blue-700 active:bg-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed transition-all touch-no-select"
             :disabled="!isValid || posStore.isProcessingPayment"
             @click="handlePayment"
           >
-            <i v-if="posStore.isProcessingPayment" class="fas fa-spinner fa-spin mr-2"></i>
-            {{ posStore.isProcessingPayment ? 'Processing...' : 'Complete Payment' }}
+            <i v-if="posStore.isProcessingPayment" class="fas fa-spinner fa-spin mr-3 text-xl"></i>
+            <span>{{ posStore.isProcessingPayment ? 'Processing...' : 'Complete Payment' }}</span>
           </button>
           <button
             type="button"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            class="touch-button pos-touch-target mt-3 w-full inline-flex justify-center items-center rounded-xl border-2 border-gray-300 shadow-md px-6 py-4 bg-white text-xl font-semibold text-gray-700 hover:bg-gray-50 active:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto transition-all touch-no-select"
             @click="$emit('close')"
           >
             Cancel

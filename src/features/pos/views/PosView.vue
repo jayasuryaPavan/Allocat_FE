@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { usePosStore } from '../stores/posStore'
+import { useShiftStore } from '../stores/shiftStore'
 import { useAuthStore } from '@/core/stores/auth'
 import { useNotificationStore } from '@/core/stores/notification'
 import ProductSearch from '../components/ProductSearch.vue'
@@ -13,6 +14,7 @@ import ReturnOrderModal from '../components/ReturnOrderModal.vue'
 import type { CheckoutRequest } from '../types'
 
 const posStore = usePosStore()
+const shiftStore = useShiftStore()
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
 
@@ -23,12 +25,16 @@ const showReturnModal = ref(false)
 const selectedCustomer = ref<any>(null)
 
 const cart = computed(() => posStore.currentCart)
+const activeShift = computed(() => shiftStore.activeShift)
+
+const getStoreId = () => Number((authStore.currentUser as any)?.storeId ?? 1)
+const getUserId = () => Number(authStore.currentUser?.id ?? 1)
 
 onMounted(async () => {
   // Initialize cart if not exists
   if (!posStore.currentCart) {
-    const storeId = 1 // Default store ID for now
-    const cashierId = Number(authStore.currentUser?.id) || 1
+    const storeId = getStoreId() // Default store ID for now
+    const cashierId = getUserId()
     
     // Run diagnostics if in development mode
     if (import.meta.env.DEV) {
@@ -47,6 +53,12 @@ onMounted(async () => {
       // Error is already handled in posStore with notification
       console.error('Failed to create cart on mount:', error)
     }
+  }
+
+  try {
+    await shiftStore.loadActiveShift(getStoreId(), getUserId())
+  } catch (error) {
+    // ignore
   }
 })
 
@@ -131,44 +143,46 @@ const handlePaymentComplete = async (paymentData: any) => {
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="grid grid-cols-4 gap-2">
+      <!-- Action Buttons - Touch Optimized -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 touch-grid">
         <button 
-          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all"
+          :class="{'opacity-50 cursor-not-allowed': !posStore.hasItems, 'hover:bg-gray-50 hover:border-blue-400': posStore.hasItems}"
           @click="showDiscountDialog = true"
           :disabled="!posStore.hasItems"
         >
-          <i class="fas fa-percent text-blue-500"></i>
-          <span>Discount</span>
+          <i class="fas fa-percent text-blue-500 text-2xl"></i>
+          <span class="text-base">Discount</span>
         </button>
         <button 
-          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all"
+          :class="{'opacity-50 cursor-not-allowed': !posStore.hasItems, 'hover:bg-gray-50 hover:border-orange-400': posStore.hasItems}"
           @click="handleSuspend"
           :disabled="!posStore.hasItems"
         >
-          <i class="fas fa-pause text-orange-500"></i>
-          <span>Suspend</span>
+          <i class="fas fa-pause text-orange-500 text-2xl"></i>
+          <span class="text-base">Suspend</span>
         </button>
         <button 
-          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all hover:bg-gray-50 hover:border-green-400"
           @click="showHeldOrdersModal = true"
         >
-          <i class="fas fa-undo text-green-500"></i>
-          <span>Recall</span>
+          <i class="fas fa-undo text-green-500 text-2xl"></i>
+          <span class="text-base">Recall</span>
         </button>
         <button 
-          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all hover:bg-gray-50 hover:border-orange-400"
           @click="showReturnModal = true"
         >
-          <i class="fas fa-undo text-orange-500"></i>
-          <span>Return</span>
+          <i class="fas fa-undo text-orange-500 text-2xl"></i>
+          <span class="text-base">Return</span>
         </button>
         <button 
-          class="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium flex flex-col items-center justify-center gap-1"
+          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all hover:bg-gray-50 hover:border-purple-400 md:col-span-2"
           @click="$router.push('/pos/sales')"
         >
-          <i class="fas fa-history text-purple-500"></i>
-          <span>History</span>
+          <i class="fas fa-history text-purple-500 text-2xl"></i>
+          <span class="text-base">History</span>
         </button>
       </div>
     </div>
@@ -178,12 +192,12 @@ const handlePaymentComplete = async (paymentData: any) => {
       <CartSummary class="h-full">
         <template #actions>
           <button
-            class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold rounded-lg shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+            class="w-full touch-button pos-touch-target bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-2xl font-bold rounded-xl shadow-lg active:shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 touch-no-select"
             :disabled="!posStore.hasItems"
             @click="handleCheckout"
           >
             <span>Checkout</span>
-            <i class="fas fa-chevron-right ml-2"></i>
+            <i class="fas fa-chevron-right text-xl"></i>
           </button>
         </template>
       </CartSummary>
