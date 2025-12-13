@@ -630,7 +630,7 @@ const handlePdfExtract = async (extraction: XtractorResponse) => {
   // For now, process the first table (can be enhanced to let user choose)
   const firstTable = allTablesData[0]
   const extractedCsvData = firstTable.data
-  
+
   // Create CSV inventory data format
   const csvInventoryData: CSVInventoryData = {
     headers: extractedCsvData.headers,
@@ -644,6 +644,8 @@ const handlePdfExtract = async (extraction: XtractorResponse) => {
   // Trigger AI mapping with extracted data
   if (enableAICsvMapping) {
     isAnalyzing.value = true
+    // Open the import/review modal so the user can see the AI mapping & preview
+    showImportModal.value = true
     
     try {
       const mappingResult = await AICsvMappingService.analyzeAndMapColumns(
@@ -669,6 +671,8 @@ const handlePdfExtract = async (extraction: XtractorResponse) => {
     // Direct preview without AI mapping
     csvData.value = csvInventoryData
     showPreview.value = true
+    // Make sure the preview is visible
+    showImportModal.value = true
   }
 }
 

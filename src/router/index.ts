@@ -96,6 +96,26 @@ const routes: RouteRecordRaw[] = [
           roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
           permissions: ['analytics:read']
         }
+      },
+      {
+        path: 'enhanced',
+        name: 'EnhancedAnalytics',
+        component: () => import('@/features/analytics/views/EnhancedAnalyticsDashboard.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+          permissions: ['analytics:read']
+        }
+      },
+      {
+        path: 'profitability',
+        name: 'Profitability',
+        component: () => import('@/features/analytics/views/ProfitabilityView.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+          permissions: ['analytics:read']
+        }
       }
     ]
   },

@@ -198,6 +198,20 @@ const navigationItems = computed(() => [
     permissions: ['reports:view']
   },
   {
+    name: 'Analytics',
+    href: '/analytics/enhanced',
+    icon: ChartBarIcon,
+    roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+    permissions: ['analytics:read']
+  },
+  {
+    name: 'Profitability',
+    href: '/analytics/profitability',
+    icon: ChartBarIcon,
+    roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+    permissions: ['analytics:read']
+  },
+  {
     name: 'Admin',
     href: '/admin',
     icon: CogIcon,

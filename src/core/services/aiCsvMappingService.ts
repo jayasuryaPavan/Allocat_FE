@@ -136,7 +136,12 @@ Return ONLY the JSON array, no markdown formatting.`
   ): AIMappingResult {
     const mappings: ColumnMapping[] = []
     const synonyms: Record<string, string[]> = {
-      productCode: ['sku', 'code', 'item_code', 'product_id', 'item_id', 'item#', 'itemcode', 'product_code'],
+      productCode: [
+        'sku', 'sku#',
+        'code',
+        'item_code', 'product_id', 'item_id', 'item#', 'itemcode', 'product_code',
+        'lcbo', 'lcbo#'
+      ],
       productName: ['name', 'item_name', 'product', 'item', 'description', 'product_name', 'itemname'],
       expectedQuantity: ['qty', 'quantity', 'amount', 'count', 'stock', 'expected_quantity', 'expected_qty'],
       unitPrice: ['price', 'cost', 'unit_price', 'rate', 'value', 'unitprice', 'unit_cost'],
@@ -147,12 +152,24 @@ Return ONLY the JSON array, no markdown formatting.`
     }
 
     headers.forEach(header => {
-      const normalized = header.toLowerCase().replace(/[_\s-]/g, '')
+      const normalized = header.toLowerCase().replace(/[_\s-]/g, '').replace(/#/g, '')
+      const containsHash = header.includes('#')
+
+      // Treat columns containing '#' (e.g., "LCBO #", "SKU#") as product codes
+      if (containsHash && targetFields.includes('productCode')) {
+        mappings.push({
+          csvColumn: header,
+          mappedField: 'productCode',
+          confidence: 0.9,
+          reasoning: 'Header contains "#" which typically denotes a code (e.g., SKU#, LCBO#)'
+        })
+        return
+      }
       
       for (const [field, syns] of Object.entries(synonyms)) {
         if (targetFields.includes(field)) {
           for (const syn of syns) {
-            const normalizedSyn = syn.replace(/[_\s-]/g, '')
+            const normalizedSyn = syn.replace(/[_\s-]/g, '').replace(/#/g, '')
             if (normalized.includes(normalizedSyn) || normalizedSyn.includes(normalized)) {
               mappings.push({
                 csvColumn: header,
