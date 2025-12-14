@@ -8,10 +8,12 @@ type QuickRange = 'today' | 'week' | 'month'
 const profitStore = useProfitStore()
 const authStore = useAuthStore()
 
-const storeId = ref<number>(() => {
+const getInitialStoreId = (): number => {
   const userDetails = JSON.parse(sessionStorage.getItem('user_details') || '{}')
   return Number(userDetails.storeId || (authStore.currentUser as any)?.storeId || 1)
-}() as number)
+}
+
+const storeId = ref<number>(getInitialStoreId())
 
 const startDate = ref('')
 const endDate = ref('')
