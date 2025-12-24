@@ -176,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { InventoryApiService } from '../core/services/inventoryApi'
 import type { ReceivedStock } from '../core/types/inventory'
 
@@ -228,6 +228,21 @@ const paginatedStock = computed(() => {
 const totalPages = computed(() => {
   return Math.ceil(filteredStock.value.length / itemsPerPage.value)
 })
+
+// Ensure current page is always within valid bounds when data or page size changes
+watch(
+  [filteredStock, itemsPerPage],
+  () => {
+    const pages = Math.max(1, Math.ceil(filteredStock.value.length / itemsPerPage.value || 1))
+    if (currentPage.value > pages) {
+      currentPage.value = pages
+    }
+    if (currentPage.value < 1) {
+      currentPage.value = 1
+    }
+  },
+  { immediate: true }
+)
 
 // Methods
 const loadReceivedStock = async () => {
@@ -554,6 +569,11 @@ onMounted(() => {
 
 .pagination-info {
   @apply text-sm text-gray-700 dark:text-gray-300;
+}
+
+.pagination-button:last-child {
+  /* Add extra space so the "Next" button doesn't sit under the InvenGadu chat icon */
+  @apply mr-16;
 }
 </style>
 

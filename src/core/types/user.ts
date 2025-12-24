@@ -6,13 +6,25 @@ export interface User {
   fullName: string
   avatar?: string
   phone?: string
-  role: Role
+  role?: Role
   permissions: Permission[]
   isActive: boolean
   isEmailVerified: boolean
   lastLoginAt?: string
   createdAt: string
   updatedAt: string
+}
+
+// Centralized user role definitions to avoid hardcoded values across the app
+export enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ADMIN = 'ADMIN',
+  STORE_MANAGER = 'STORE_MANAGER',
+  SALES_STAFF = 'SALES_STAFF',
+  INVENTORY_MANAGER = 'INVENTORY_MANAGER',
+  WAREHOUSE_STAFF = 'WAREHOUSE_STAFF',
+  ACCOUNTANT = 'ACCOUNTANT',
+  VIEWER = 'VIEWER',
 }
 
 export interface Role {

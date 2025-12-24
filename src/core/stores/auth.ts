@@ -93,6 +93,12 @@ export const useAuthStore = defineStore('auth', () => {
       setToken(data.accessToken)
       setRefreshToken(data.refreshToken)
 
+      // Store the store code in session storage
+      if (data.storeCode) {
+        sessionStorage.setItem('active_store_code', data.storeCode)
+        localStorage.setItem('active_store_code', data.storeCode)
+      }
+
       // Map user into our shape as much as possible
       const mappedUser: User = {
         id: String(data.userId ?? ''),
@@ -152,22 +158,23 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Logout
-  const logout = () => {
-    const refreshToken = getRefreshToken()
-    
-    if (refreshToken) {
-      apiService.post('/auth/logout', { refreshToken }).catch(() => {
-        // Ignore logout errors
-      })
+  const logout = async () => {
+    try {
+      // Call backend logout endpoint with Authorization header
+      await apiService.post('/auth/logout')
+    } catch (error) {
+      // Ignore logout errors - clear tokens on client side anyway
+      console.error('Logout API call failed:', error)
+    } finally {
+      // Always clear local data regardless of API response
+      clearAuthData()
+      currentUser.value = null
+      isAuthenticated.value = false
+      stopTokenRefreshTimer()
+      
+      router.push('/auth/login')
+      notificationStore.info('Logged out', 'You have been successfully logged out')
     }
-
-    clearAuthData()
-    currentUser.value = null
-    isAuthenticated.value = false
-    stopTokenRefreshTimer()
-    
-    router.push('/auth/login')
-    notificationStore.info('Logged out', 'You have been successfully logged out')
   }
 
   // Refresh token
@@ -175,29 +182,52 @@ export const useAuthStore = defineStore('auth', () => {
     const refreshTok = getRefreshToken()
     
     if (!refreshTok) {
-      logout()
+      console.error('No refresh token available')
+      await logout()
       throw new Error('No refresh token available')
     }
 
     try {
-      // Send Authorization: Bearer {refreshToken}
+      console.log('Attempting to refresh token...')
+      // Use the axios instance directly to bypass the regular interceptor
       const axios = apiService.getAxiosInstance()
       const resp = await axios.post('/auth/refresh', undefined, {
-        headers: { Authorization: `Bearer ${refreshTok}` }
-      })
+        headers: { 
+          Authorization: `Bearer ${refreshTok}`,
+          'Content-Type': 'application/json'
+        },
+        // Skip the retry flag to prevent interceptor from interfering
+        skipAuthRefresh: true
+      } as any)
+      
       const apiResp = resp.data
+      console.log('Refresh response:', apiResp)
+      
       if (!apiResp?.success) {
         throw new Error(apiResp?.error || 'Failed to refresh token')
       }
+      
       const data = apiResp.data
       const newToken = data.accessToken
 
+      if (!newToken) {
+        throw new Error('No access token in refresh response')
+      }
+
       setToken(newToken)
+      
+      // Update refresh token if provided
+      if (data.refreshToken) {
+        setRefreshToken(data.refreshToken)
+      }
+      
       startTokenRefreshTimer()
+      console.log('Token refreshed successfully')
       
       return newToken
-    } catch (error) {
-      logout()
+    } catch (error: any) {
+      console.error('Token refresh failed:', error.response?.data || error.message)
+      await logout()
       throw error
     }
   }
@@ -211,6 +241,16 @@ export const useAuthStore = defineStore('auth', () => {
         throw new Error(apiResp?.error || 'Failed to load user')
       }
       const data = apiResp.data
+      
+      // Save all user details to session storage for later use
+      sessionStorage.setItem('user_details', JSON.stringify(data))
+      
+      // Save store code to session storage
+      if (data.storeCode) {
+        sessionStorage.setItem('active_store_code', data.storeCode)
+        localStorage.setItem('active_store_code', data.storeCode)
+      }
+      
       const user: User = {
         id: String(data.userId ?? ''),
         email: data.email ?? '',
@@ -438,7 +478,9 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('current_user')
     localStorage.removeItem('redirect_url')
-    localStorage.removeItem('active_store_id')
+    localStorage.removeItem('active_store_code')
+    sessionStorage.removeItem('active_store_code')
+    sessionStorage.removeItem('user_details')
   }
 
   const isTokenExpired = (token: string): boolean => {

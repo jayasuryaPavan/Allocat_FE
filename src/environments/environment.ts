@@ -1,6 +1,7 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api',
+  development: true,
+  apiUrl: 'http://localhost:8080/api', // Use relative URL to leverage Vite proxy in development
   wsUrl: 'ws://localhost:8080/ws',
   appName: 'Allocat',
   version: '1.0.0',
@@ -19,7 +20,8 @@ export const environment = {
     enableReceiptPrinting: true,
     enableInventoryTracking: true,
     enableCustomerLoyalty: true,
-    enableAdvancedReports: true
+    enableAdvancedReports: true,
+    enableDevBypass: false
   },
   limits: {
     maxFileSize: 10 * 1024 * 1024, // 10MB

@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   staging: false,
   development: true,
-  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  apiUrl: 'http://localhost:8080/api', // Defaults to relative URL for Vite proxy
   appName: 'Allocat',
   version: '1.0.0',
   features: {
@@ -28,6 +28,13 @@ export const environment = {
     maxFileSize: 10 * 1024 * 1024, // 10MB
     supportedImageTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
     supportedDocumentTypes: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+  },
+  integrations: {
+    enableInvenGaduAssist: true,
+    invenGaduSearchUrl: '',
+    enableAICsvMapping: true, // Enable AI-powered CSV column mapping
+    xtractorApiUrl: 'http://localhost:8000', // Xtractor Agent API endpoint
+    enablePdfExtraction: true // Enable PDF table extraction
   }
 }
 

@@ -2,13 +2,10 @@ import { ApiService } from './api'
 
 const api = new ApiService()
 import type { 
-  Product, 
   Inventory, 
   ReceivedStock, 
   StockDiscrepancy, 
-  InventoryStats,
-  ReservationRequest,
-  ReleaseReservationRequest
+  InventoryStats
 } from '../types/inventory'
 import type { ApiResponse } from '../types/api'
 
@@ -52,21 +49,31 @@ export class InventoryApiService {
     verifiedQuantity: number, 
     verifiedBy: string
   ): Promise<ApiResponse<Inventory>> {
-    const formData = new FormData()
-    formData.append('verifiedQuantity', verifiedQuantity.toString())
-    formData.append('verifiedBy', verifiedBy)
+    const queryParams = new URLSearchParams()
+    queryParams.append('verifiedQuantity', verifiedQuantity.toString())
+    queryParams.append('verifiedBy', verifiedBy)
     
-    const response = await api.post(`/inventory/received-stock/${receivedStockId}/verify`, formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    })
+    const response = await api.post(`/inventory/received-stock/${receivedStockId}/verify?${queryParams.toString()}`)
     return response.data
   }
 
   // Inventory Management
-  static async getCurrentInventory(): Promise<ApiResponse<Inventory[]>> {
-    const response = await api.get('/inventory/current')
+  static async getCurrentInventory(params?: {
+    page?: number
+    size?: number
+    sortBy?: string
+    sortDirection?: 'asc' | 'desc'
+  }): Promise<ApiResponse<any>> {
+    const queryParams = new URLSearchParams()
+    if (params?.page !== undefined) queryParams.append('page', params.page.toString())
+    if (params?.size !== undefined) queryParams.append('size', params.size.toString())
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+    if (params?.sortDirection) queryParams.append('sortDirection', params.sortDirection)
+    
+    const url = queryParams.toString() 
+      ? `/inventory/current?${queryParams.toString()}` 
+      : '/inventory/current'
+    const response = await api.get(url)
     return response.data
   }
 
@@ -75,58 +82,26 @@ export class InventoryApiService {
     return response.data
   }
 
-  static async getLowStockItems(): Promise<ApiResponse<Inventory[]>> {
-    const response = await api.get('/inventory/low-stock')
-    return response.data
-  }
-
-  static async getOutOfStockItems(): Promise<ApiResponse<Inventory[]>> {
-    const response = await api.get('/inventory/out-of-stock')
-    return response.data
-  }
-
-  static async reserveInventory(reservation: ReservationRequest): Promise<ApiResponse<Inventory>> {
-    const formData = new FormData()
-    formData.append('productId', reservation.productId.toString())
-    formData.append('quantity', reservation.quantity.toString())
-    formData.append('reservedBy', reservation.reservedBy)
-    if (reservation.notes) {
-      formData.append('notes', reservation.notes)
-    }
+  static async getLowStockItems(params?: {
+    page?: number
+    size?: number
+    sortBy?: string
+    sortDirection?: 'asc' | 'desc'
+  }): Promise<ApiResponse<any>> {
+    const queryParams = new URLSearchParams()
+    if (params?.page !== undefined) queryParams.append('page', params.page.toString())
+    if (params?.size !== undefined) queryParams.append('size', params.size.toString())
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+    if (params?.sortDirection) queryParams.append('sortDirection', params.sortDirection)
     
-    const response = await api.post('/inventory/reserve', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    })
+    const url = queryParams.toString() 
+      ? `/inventory/low-stock?${queryParams.toString()}` 
+      : '/inventory/low-stock'
+    const response = await api.get(url)
     return response.data
   }
 
-  static async releaseReservation(release: ReleaseReservationRequest): Promise<ApiResponse<Inventory>> {
-    const formData = new FormData()
-    formData.append('productId', release.productId.toString())
-    formData.append('quantity', release.quantity.toString())
-    formData.append('releasedBy', release.releasedBy)
-    if (release.notes) {
-      formData.append('notes', release.notes)
-    }
-    
-    const response = await api.post('/inventory/release-reservation', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    })
-    return response.data
-  }
-
-  // Stock Discrepancies
-  static async getStockDiscrepancies(): Promise<ApiResponse<StockDiscrepancy[]>> {
-    const response = await api.get('/inventory/discrepancies')
-    return response.data
-  }
-
-  // Product Management
-  static async getAllProducts(params?: {
+  static async getOutOfStockItems(params?: {
     page?: number
     size?: number
     search?: string
@@ -144,85 +119,51 @@ export class InventoryApiService {
     if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
     if (params?.sortDirection) queryParams.append('sortDirection', params.sortDirection)
     
-    const response = await api.get(`/products?${queryParams.toString()}`)
+    const url = queryParams.toString() 
+      ? `/inventory/out-of-stock?${queryParams.toString()}` 
+      : '/inventory/out-of-stock'
+    const response = await api.get(url)
     return response.data
   }
 
-  static async getProductById(id: number): Promise<ApiResponse<Product>> {
-    const response = await api.get(`/products/${id}`)
-    return response.data
-  }
-
-  static async getProductByCode(productCode: string): Promise<ApiResponse<Product>> {
-    const response = await api.get(`/products/code/${productCode}`)
-    return response.data
-  }
-
-  static async createProduct(product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Product>> {
-    const response = await api.post('/products', product)
-    return response.data
-  }
-
-  static async updateProduct(id: number, product: Partial<Product>): Promise<ApiResponse<Product>> {
-    const response = await api.put(`/products/${id}`, product)
-    return response.data
-  }
-
-  static async deleteProduct(id: number): Promise<ApiResponse<void>> {
-    const response = await api.delete(`/products/${id}`)
-    return response.data
-  }
-
-  static async searchProducts(searchTerm: string): Promise<ApiResponse<Product[]>> {
-    const response = await api.get(`/products/search?searchTerm=${encodeURIComponent(searchTerm)}`)
-    return response.data
-  }
-
-  static async getCategories(): Promise<ApiResponse<string[]>> {
-    const response = await api.get('/products/categories')
-    return response.data
-  }
-
-  // Statistics and Analytics
-  static async getInventoryStats(): Promise<ApiResponse<InventoryStats>> {
-    const response = await api.get('/inventory/stats')
-    return response.data
-  }
-
-  // Additional endpoints from API documentation
-  static async getReceivedStockById(id: number): Promise<ApiResponse<ReceivedStock>> {
-    const response = await api.get(`/inventory/received-stock/${id}`)
-    return response.data
-  }
-
-  static async updateReceivedStock(id: number, data: Partial<ReceivedStock>): Promise<ApiResponse<ReceivedStock>> {
-    const response = await api.put(`/inventory/received-stock/${id}`, data)
-    return response.data
-  }
-
-  static async deleteReceivedStock(id: number): Promise<ApiResponse<void>> {
-    const response = await api.delete(`/inventory/received-stock/${id}`)
-    return response.data
-  }
-
-  // Utility methods
-  static async exportInventoryToCSV(): Promise<Blob> {
-    const response = await api.get('/inventory/export', {
-      responseType: 'blob'
-    })
-    return response.data
-  }
-
-  static async importInventoryFromCSV(file: File): Promise<ApiResponse<{ imported: number; errors: number }>> {
-    const formData = new FormData()
-    formData.append('file', file)
+  static async reserveInventory(
+    productId: number,
+    quantity: number,
+    reservedBy: string
+  ): Promise<ApiResponse<Inventory>> {
+    const queryParams = new URLSearchParams()
+    queryParams.append('productId', productId.toString())
+    queryParams.append('quantity', quantity.toString())
+    queryParams.append('reservedBy', reservedBy)
     
-    const response = await api.post('/inventory/import', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
+    const response = await api.post(`/inventory/reserve?${queryParams.toString()}`)
     return response.data
   }
+
+  static async releaseReservation(
+    productId: number,
+    quantity: number,
+    releasedBy: string
+  ): Promise<ApiResponse<Inventory>> {
+    const queryParams = new URLSearchParams()
+    queryParams.append('productId', productId.toString())
+    queryParams.append('quantity', quantity.toString())
+    queryParams.append('releasedBy', releasedBy)
+    
+    const response = await api.post(`/inventory/release-reservation?${queryParams.toString()}`)
+    return response.data
+  }
+
+  // Stock Discrepancies
+  static async getStockDiscrepancies(): Promise<ApiResponse<StockDiscrepancy[]>> {
+    const response = await api.get('/inventory/discrepancies')
+    return response.data
+  }
+
+  // Note: Product management methods have been moved to productsApi.ts
+  // Import and use productsApiService instead
+
+  // Note: Additional utility methods can be added here as needed
+  // The backend doesn't currently have these endpoints, but they can be added when implemented
 }
 

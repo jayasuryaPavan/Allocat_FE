@@ -3,8 +3,10 @@
     <!-- Sidebar -->
     <div 
       :class="[
-        'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out',
-        sidebarCollapsed ? '-translate-x-full lg:translate-x-0 lg:w-16' : 'translate-x-0'
+        'fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ease-in-out',
+        sidebarCollapsed 
+          ? '-translate-x-full lg:translate-x-0 lg:w-16' 
+          : 'translate-x-0 w-64'
       ]"
     >
       <Sidebar 
@@ -69,10 +71,10 @@ const currentUser = computed(() => authStore.currentUser)
 const toggleSidebar = () => {
   sidebarCollapsed.value = !sidebarCollapsed.value
   
-  // Save preference
+  // Save to localStorage only (no API call for frequent sidebar toggles)
   const preferences = authStore.getUserPreferences()
   preferences.sidebarCollapsed = sidebarCollapsed.value
-  authStore.updateUserPreferences(preferences)
+  localStorage.setItem('user_preferences', JSON.stringify(preferences))
 }
 
 const toggleTheme = () => {

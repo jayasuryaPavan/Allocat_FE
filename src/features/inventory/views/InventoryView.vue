@@ -10,7 +10,7 @@
           Track and manage your inventory levels. Import data from CSV files.
         </p>
       </div>
-      <div class="mt-4 flex md:ml-4 md:mt-0">
+      <div class="mt-4 flex space-x-2 md:ml-4 md:mt-0">
         <button
           @click="showImportModal = true"
           class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -19,6 +19,16 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
           Import CSV
+        </button>
+        <button
+          v-if="enablePdfExtraction"
+          @click="showPdfExtractorModal = true"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+        >
+          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Extract from PDF
         </button>
       </div>
     </div>
@@ -292,17 +302,42 @@
                   </button>
                 </div>
 
+                <!-- AI Analyzing Indicator -->
+                <div v-if="isAnalyzing" class="text-center py-12">
+                  <div class="inline-flex items-center space-x-3 px-6 py-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <div class="text-left">
+                      <p class="text-sm font-medium text-blue-900 dark:text-blue-300">InvenGadu is analyzing your CSV...</p>
+                      <p class="text-xs text-blue-700 dark:text-blue-400">Mapping columns automatically</p>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Upload Component -->
                 <CSVUpload
-                  v-if="!showPreview"
+                  v-if="!showPreview && !showMappingReview && !isAnalyzing"
                   @upload-success="handleUploadSuccess"
                   @upload-error="handleUploadError"
                   @file-selected="handleFileSelected"
                 />
 
-                <!-- Preview Component -->
+                <!-- AI Column Mapping Review -->
+                <CSVColumnMappingReview
+                  v-if="showMappingReview && currentMappingResult && csvData"
+                  :mapping-result="currentMappingResult"
+                  :sample-data="csvData.rows"
+                  :available-fields="availableFields"
+                  @confirm="handleMappingConfirmed"
+                  @cancel="handleMappingCancelled"
+                  @ask-ai="handleAskAI"
+                />
+
+                <!-- Preview Component (fallback or non-AI mode) -->
                 <CSVDataPreview
-                  v-if="showPreview && csvData"
+                  v-if="showPreview && !showMappingReview && csvData"
                   :data="csvData"
                   @import="handleImport"
                   @cancel="handleCancelImport"
@@ -313,6 +348,13 @@
         </div>
       </div>
     </div>
+
+    <!-- PDF Extractor Modal -->
+    <PDFExtractorModal
+      v-if="showPdfExtractorModal"
+      @close="closePdfExtractor"
+      @extract="handlePdfExtract"
+    />
   </div>
 </template>
 
@@ -320,9 +362,16 @@
 import { ref, computed, onMounted } from 'vue'
 import CSVUpload from '../../../components/CSVUpload.vue'
 import CSVDataPreview from '../../../components/CSVDataPreview.vue'
+import CSVColumnMappingReview from '../../../components/CSVColumnMappingReview.vue'
+import PDFExtractorModal from '../../../components/PDFExtractorModal.vue'
 import ReceivedStockManager from '../../../components/ReceivedStockManager.vue'
 import StockDiscrepanciesManager from '../../../components/StockDiscrepanciesManager.vue'
 import { InventoryApiService } from '../../../core/services/inventoryApi'
+import { AICsvMappingService } from '../../../core/services/aiCsvMappingService'
+import { xtractorApi } from '../../../core/services/xtractorApi'
+import type { ColumnMapping, AIMappingResult } from '../../../core/services/aiCsvMappingService'
+import type { XtractorResponse } from '../../../core/services/xtractorApi'
+import { environment } from '../../../environments'
 import type { 
   InventoryItem, 
   CSVInventoryData, 
@@ -335,7 +384,11 @@ import type {
 // Reactive state
 const showImportModal = ref(false)
 const showPreview = ref(false)
+const showMappingReview = ref(false)
+const showPdfExtractorModal = ref(false)
+const isAnalyzing = ref(false)
 const csvData = ref<CSVInventoryData | null>(null)
+const currentMappingResult = ref<AIMappingResult | null>(null)
 const inventoryItems = ref<Inventory[]>([])
 const searchTerm = ref('')
 const currentPage = ref(1)
@@ -344,8 +397,27 @@ const activeTab = ref('inventory')
 const loading = ref(false)
 const error = ref('')
 
+// AI CSV Mapping feature flag
+const enableAICsvMapping = environment.integrations?.enableAICsvMapping ?? false
+
+// PDF Extraction feature flag
+const enablePdfExtraction = environment.integrations?.enablePdfExtraction ?? false
+
+// Available fields for mapping
+const availableFields = [
+  'productCode',
+  'productName',
+  'expectedQuantity',
+  'unitPrice',
+  'supplierName',
+  'supplierInvoice',
+  'batchNumber',
+  'notes'
+]
+
 // Computed properties
 const filteredInventory = computed(() => {
+  if (!Array.isArray(inventoryItems.value)) return []
   if (!searchTerm.value) return inventoryItems.value
   
   const term = searchTerm.value.toLowerCase()
@@ -368,6 +440,10 @@ const totalPages = computed(() => {
 })
 
 const inventoryStats = computed(() => {
+  if (!Array.isArray(inventoryItems.value)) {
+    return { totalItems: 0, inStock: 0, lowStock: 0, outOfStock: 0 }
+  }
+  
   const total = inventoryItems.value.length
   const inStock = inventoryItems.value.filter(item => item.currentQuantity > 0).length
   const lowStock = inventoryItems.value.filter(item => 
@@ -383,9 +459,36 @@ const handleFileSelected = (file: File) => {
   console.log('File selected:', file.name)
 }
 
-const handleUploadSuccess = (data: CSVInventoryData) => {
+const handleUploadSuccess = async (data: CSVInventoryData) => {
   csvData.value = data
-  showPreview.value = true
+  
+  // If AI CSV mapping is enabled, analyze columns first
+  if (enableAICsvMapping) {
+    isAnalyzing.value = true
+    
+    try {
+      // AI analyzes and maps columns
+      const mappingResult = await AICsvMappingService.analyzeAndMapColumns(
+        data.headers,
+        data.rows.slice(0, 5), // Send first 5 rows as samples
+        'receivedStock'
+      )
+      
+      currentMappingResult.value = mappingResult
+      showMappingReview.value = true
+      
+      console.log('AI Mapping Result:', mappingResult)
+    } catch (error) {
+      console.error('AI mapping failed, falling back to preview:', error)
+      // Fallback to regular preview
+      showPreview.value = true
+    } finally {
+      isAnalyzing.value = false
+    }
+  } else {
+    // Original flow: show preview directly
+    showPreview.value = true
+  }
 }
 
 const handleUploadError = (error: string) => {
@@ -439,13 +542,17 @@ const loadInventory = async () => {
   
   try {
     const response = await InventoryApiService.getCurrentInventory()
-    if (response.success) {
-      inventoryItems.value = response.data
+    if (response.success && response.data) {
+      // Handle Spring Boot Page structure
+      const pageData = response.data as any
+      inventoryItems.value = Array.isArray(pageData.content) ? pageData.content : []
     } else {
       error.value = response.message || 'Failed to load inventory'
+      inventoryItems.value = []
     }
   } catch (err) {
     error.value = 'Failed to load inventory'
+    inventoryItems.value = []
     console.error('Error loading inventory:', err)
   } finally {
     loading.value = false
@@ -464,7 +571,113 @@ const handleStockRejected = (stock: ReceivedStock) => {
 
 const handleCancelImport = () => {
   showPreview.value = false
+  showMappingReview.value = false
   csvData.value = null
+  currentMappingResult.value = null
+}
+
+const handleMappingConfirmed = async (mappings: ColumnMapping[]) => {
+  if (!csvData.value) return
+  
+  try {
+    // Transform CSV data using confirmed mappings
+    const transformedData = AICsvMappingService.transformData(csvData.value.rows, mappings)
+    
+    console.log('Transformed data:', transformedData)
+    
+    // Proceed with import using transformed data
+    await handleImport(transformedData)
+    
+    // Close mapping review
+    showMappingReview.value = false
+  } catch (error) {
+    console.error('Failed to transform and import data:', error)
+  }
+}
+
+const handleMappingCancelled = () => {
+  showMappingReview.value = false
+  csvData.value = null
+  currentMappingResult.value = null
+}
+
+const handleAskAI = (unmappedColumns: string[]) => {
+  // Open InvenGadu chat with context about unmapped columns
+  const prompt = `I'm trying to import a CSV file to my inventory system. I have these unmapped columns: ${unmappedColumns.join(', ')}.
+
+My CSV sample data looks like this:
+${JSON.stringify(csvData.value?.rows.slice(0, 2), null, 2)}
+
+My target fields are: ${availableFields.join(', ')}
+
+Can you help me understand which columns should map to which target fields?`
+
+  window.dispatchEvent(new CustomEvent('inven-gadu:open', { detail: { prompt } }))
+}
+
+// PDF Extraction handlers
+const handlePdfExtract = async (extraction: XtractorResponse) => {
+  showPdfExtractorModal.value = false
+  
+  // Convert all extracted tables to CSV format
+  const allTablesData = xtractorApi.convertAllTablesToCSV(extraction)
+  
+  if (allTablesData.length === 0) {
+    console.error('No tables to process')
+    return
+  }
+  
+  // For now, process the first table (can be enhanced to let user choose)
+  const firstTable = allTablesData[0]
+  const extractedCsvData = firstTable.data
+
+  // Create CSV inventory data format
+  const csvInventoryData: CSVInventoryData = {
+    headers: extractedCsvData.headers,
+    rows: extractedCsvData.rows,
+    totalRows: extractedCsvData.rows.length,
+    validRows: extractedCsvData.rows.length,
+    invalidRows: 0,
+    errors: []
+  }
+  
+  // Trigger AI mapping with extracted data
+  if (enableAICsvMapping) {
+    isAnalyzing.value = true
+    // Open the import/review modal so the user can see the AI mapping & preview
+    showImportModal.value = true
+    
+    try {
+      const mappingResult = await AICsvMappingService.analyzeAndMapColumns(
+        extractedCsvData.headers,
+        extractedCsvData.rows.slice(0, 5),
+        'receivedStock'
+      )
+      
+      csvData.value = csvInventoryData
+      currentMappingResult.value = mappingResult
+      showMappingReview.value = true
+      
+      console.log('PDF extraction -> AI Mapping Result:', mappingResult)
+    } catch (error) {
+      console.error('AI mapping failed:', error)
+      // Fallback to preview
+      csvData.value = csvInventoryData
+      showPreview.value = true
+    } finally {
+      isAnalyzing.value = false
+    }
+  } else {
+    // Direct preview without AI mapping
+    csvData.value = csvInventoryData
+    showPreview.value = true
+    // Make sure the preview is visible
+    showImportModal.value = true
+  }
+}
+
+const closePdfExtractor = () => {
+  showPdfExtractorModal.value = false
 }
 
 const getStatusClass = (item: Inventory) => {

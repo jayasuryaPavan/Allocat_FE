@@ -283,3 +283,53 @@ body {
   }
 }
 
+/* Touch-friendly styles for POS */
+/* Prevent double-tap zoom on touch devices */
+* {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Touch-friendly button minimum sizes (48x48px recommended for touch) */
+.touch-button {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 12px 16px;
+  font-size: 16px; /* Minimum readable font size */
+  -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Touch-friendly input fields */
+.touch-input {
+  min-height: 48px;
+  padding: 12px 16px;
+  font-size: 16px;
+}
+
+/* Active state for touch feedback */
+.touch-button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* Larger touch targets for POS */
+.pos-touch-target {
+  min-height: 56px;
+  min-width: 56px;
+  padding: 14px 18px;
+  font-size: 18px;
+}
+
+/* Touch-friendly grid spacing */
+.touch-grid {
+  gap: 12px;
+}
+
+/* Prevent text selection on touch (for buttons) */
+.touch-no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+

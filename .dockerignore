@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Build output (will be built in container)
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test files
+tests/
+*.test.ts
+*.spec.ts
+coverage/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# Local config
+.env
+.env.local
+.env.*.local
+
+# Documentation
+docs/
+*.md
+

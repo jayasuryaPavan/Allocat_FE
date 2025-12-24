@@ -155,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { CSVInventoryData } from '../core/types/inventory'
 
 interface Props {
@@ -203,6 +203,21 @@ const paginatedData = computed(() => {
 const totalPages = computed(() => {
   return Math.ceil(filteredData.value.length / itemsPerPage.value)
 })
+
+// Keep current page within valid range when filtered data or page size changes
+watch(
+  [filteredData, itemsPerPage],
+  () => {
+    const pages = Math.max(1, Math.ceil(filteredData.value.length / itemsPerPage.value || 1))
+    if (currentPage.value > pages) {
+      currentPage.value = pages
+    }
+    if (currentPage.value < 1) {
+      currentPage.value = 1
+    }
+  },
+  { immediate: true }
+)
 
 // Methods
 const formatHeader = (header: string): string => {
@@ -369,6 +384,11 @@ const formatCellValue = (value: any, header: string): string => {
 
 .pagination-info {
   @apply text-sm text-gray-700 dark:text-gray-300;
+}
+
+.pagination-button:last-child {
+  /* Add extra space so the "Next" button isn't hidden behind the InvenGadu chat icon */
+  @apply mr-16;
 }
 
 .actions-section {

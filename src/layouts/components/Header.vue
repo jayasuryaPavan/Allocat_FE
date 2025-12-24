@@ -6,7 +6,7 @@
         <!-- Mobile menu button -->
         <button
           @click="$emit('toggle-sidebar')"
-          class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+          class="lg:hidden touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 transition-colors touch-no-select"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -49,20 +49,25 @@
       <div class="flex items-center space-x-4">
         <!-- Change Store button for SUPER_ADMIN -->
         <div v-if="isSuperAdmin" class="hidden md:block">
-          <button @click="openStoreModal" class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Change store</button>
+          <button 
+            @click="openStoreModal" 
+            class="touch-button px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 active:scale-95 transition-all shadow-sm font-medium touch-no-select"
+          >
+            Change store
+          </button>
         </div>
         
 
         <!-- Theme toggle -->
         <button
           @click="$emit('toggle-theme')"
-          class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+          class="touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 transition-colors touch-no-select"
           :title="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
         >
-          <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="isDarkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
-          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
           </svg>
         </button>
@@ -71,12 +76,12 @@
         <div class="relative">
           <button
             @click="toggleNotifications"
-            class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
+            class="touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 transition-colors relative touch-no-select"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h5l-5-5v5zM15 7h5l-5-5v5zM4 7h5l-5 5V7z" />
             </svg>
-            <span v-if="hasUnreadNotifications" class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+            <span v-if="hasUnreadNotifications" class="absolute top-2 right-2 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800"></span>
           </button>
 
           <!-- Notifications dropdown -->
@@ -111,31 +116,31 @@
         <div class="relative">
           <button
             @click="toggleUserMenu"
-            class="flex items-center space-x-3 p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+            class="touch-button flex items-center space-x-3 p-2 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 active:bg-gray-200 transition-all touch-no-select"
           >
             <img
               v-if="currentUser?.avatar"
               :src="currentUser.avatar"
               :alt="currentUser.fullName"
-              class="w-8 h-8 rounded-full"
+              class="w-9 h-9 rounded-full border-2 border-gray-200 dark:border-gray-600"
             />
             <div
               v-else
-              class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center"
+              class="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center border-2 border-gray-200 dark:border-gray-600"
             >
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span class="text-sm font-bold text-gray-700 dark:text-gray-300">
                 {{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}
               </span>
             </div>
             <div class="hidden md:block text-left">
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
                 {{ currentUser?.fullName }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 {{ currentUser?.role?.displayName }}
               </p>
             </div>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
@@ -143,25 +148,25 @@
           <!-- User dropdown -->
           <div
             v-if="showUserMenu"
-            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50"
+            class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
           >
             <div class="py-1">
               <router-link
                 to="/profile"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                class="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 touch-no-select active:bg-gray-200"
               >
                 Profile
               </router-link>
               <router-link
                 to="/settings"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                class="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 touch-no-select active:bg-gray-200"
               >
                 Settings
               </router-link>
               <div class="border-t border-gray-100 dark:border-gray-700"></div>
               <button
                 @click="$emit('logout')"
-                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                class="block w-full text-left px-4 py-3 text-base font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 touch-no-select active:bg-red-100"
               >
                 Sign out
               </button>
@@ -182,19 +187,24 @@
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
-          <div class="max-h-80 overflow-y-auto">
+          <div class="max-h-[60vh] overflow-y-auto">
             <button
               v-for="s in stores"
               :key="s.id"
-              @click="selectStore(s.id)"
-              class="w-full text-left px-4 py-3 text-sm flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700"
+              @click="selectStore(String(s.id))"
+              class="w-full text-left px-6 py-4 text-base flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors touch-no-select"
             >
-              <span class="text-gray-900 dark:text-white">{{ s.id }} - {{ s.name }}</span>
-              <span v-if="String(s.id) === activeStoreId" class="text-xs text-blue-600 dark:text-blue-400">Active</span>
+              <span class="text-gray-900 dark:text-white font-medium">{{ s.code }} - {{ s.name }}</span>
+              <span v-if="String(s.code) === activeStoreCode" class="px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">Active</span>
             </button>
           </div>
-          <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-right">
-            <button @click="closeStoreModal" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 rounded-md">Close</button>
+          <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 text-right">
+            <button 
+              @click="closeStoreModal" 
+              class="touch-button px-6 py-2.5 text-base font-medium bg-gray-200 hover:bg-gray-300 active:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 rounded-lg transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       </div>
@@ -240,16 +250,16 @@ const currentUser = computed(() => authStore.currentUser)
 const isDarkMode = computed(() => themeStore.isDarkMode)
 const isSuperAdmin = computed(() => (currentUser.value?.role?.name || '').toUpperCase() === 'SUPER_ADMIN')
 
-// Store switcher state
-const activeStoreId = ref<string | null>(localStorage.getItem('active_store_id'))
-const stores = ref<{ id: number; name: string }[]>([])
+// Store switcher state (using store code instead of ID)
+const activeStoreCode = ref<string | null>(localStorage.getItem('active_store_code'))
+const stores = ref<{ id: number; code: string; name: string }[]>([])
 
 const showStoreModal = ref(false)
 const openStoreModal = () => { showStoreModal.value = true }
 const closeStoreModal = () => { showStoreModal.value = false }
-const selectStore = (id: number) => {
-  activeStoreId.value = String(id)
-  localStorage.setItem('active_store_id', String(id))
+const selectStore = (code: string) => {
+  activeStoreCode.value = code
+  localStorage.setItem('active_store_code', code)
   showStoreModal.value = false
 }
 
@@ -259,9 +269,9 @@ onMounted(async () => {
       const resp = await StoresApiService.list({ active: true })
       if (resp.success) {
         stores.value = resp.data
-        if (!activeStoreId.value && stores.value.length > 0) {
-          activeStoreId.value = String(stores.value[0].id)
-          localStorage.setItem('active_store_id', String(stores.value[0].id))
+        if (!activeStoreCode.value && stores.value.length > 0) {
+          activeStoreCode.value = stores.value[0].code
+          localStorage.setItem('active_store_code', stores.value[0].code)
         }
       }
     } catch {}
