@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   staging: false,
   development: false,
-  apiUrl: import.meta.env.VITE_API_URL || 'https://api.allocat.com/api',
+  apiUrl: import.meta.env.VITE_API_URL || 'https://allocat-gateway-140766457860.northamerica-northeast2.run.app/api',
   appName: 'Allocat',
   version: '1.0.0',
   features: {

@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.allocat.com/api',
-  wsUrl: 'wss://api.allocat.com/ws',
+  apiUrl: 'https://allocat-gateway-140766457860.northamerica-northeast2.run.app/api',
+  wsUrl: 'wss://allocat-gateway-140766457860.northamerica-northeast2.run.app/ws',
   appName: 'Allocat',
   version: '1.0.0',
   enableDebugTools: false,
