@@ -72,8 +72,8 @@ export class ApiService {
 
         // Handle 401 Unauthorized
         if (error.response?.status === 401) {
-          // Skip refresh for the refresh endpoint itself to avoid infinite loop
-          if (originalRequest?.url?.includes('/auth/refresh')) {
+          // Skip refresh for the refresh endpoint itself or logout to avoid infinite loop
+          if (originalRequest?.url?.includes('/auth/refresh') || originalRequest?.url?.includes('/auth/logout')) {
             console.error('Refresh token expired or invalid')
             authStore.logout()
             return Promise.reject(error)
@@ -82,7 +82,7 @@ export class ApiService {
           // Try to refresh token only once per request
           if (originalRequest && !originalRequest._retry) {
             originalRequest._retry = true
-            
+
             try {
               const newToken = await authStore.refreshToken()
               // Update the authorization header with the new token
@@ -135,8 +135,8 @@ export class ApiService {
 
   // File upload
   async uploadFile<T = any>(
-    url: string, 
-    file: File, 
+    url: string,
+    file: File,
     onProgress?: (progress: number) => void
   ): Promise<AxiosResponse<T>> {
     const formData = new FormData()
