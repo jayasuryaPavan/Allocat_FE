@@ -75,7 +75,7 @@ export class ApiService {
           // Skip refresh for the refresh endpoint itself or logout to avoid infinite loop
           if (originalRequest?.url?.includes('/auth/refresh') || originalRequest?.url?.includes('/auth/logout')) {
             console.error('Refresh token expired or invalid')
-            authStore.logout()
+            authStore.logout(true)
             return Promise.reject(error)
           }
 
@@ -92,7 +92,7 @@ export class ApiService {
             } catch (refreshError) {
               // Refresh failed, logout user
               console.error('Token refresh failed:', refreshError)
-              authStore.logout()
+              authStore.logout(true)
               return Promise.reject(refreshError)
             }
           }

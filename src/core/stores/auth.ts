@@ -5,11 +5,11 @@ import { useRouter } from 'vue-router'
 import { useNotificationStore } from './notification'
 import { useApiService } from '@/core/services/api'
 import { environment } from '@/environments'
-import type { 
-  User, 
-  LoginCredentials, 
-  RegisterData, 
-  ForgotPasswordData, 
+import type {
+  User,
+  LoginCredentials,
+  RegisterData,
+  ForgotPasswordData,
   ResetPasswordData,
   ChangePasswordData,
   UpdateProfileData,
@@ -44,10 +44,12 @@ export const useAuthStore = defineStore('auth', () => {
         lastName: 'Akula',
         fullName: 'Surya Akula',
         avatar: `https://ui-avatars.com/api/?name=Surya+Akula&background=3b82f6&color=ffffff`,
-        role: { id: '1', name: 'admin', displayName: 'Administrator', permissions: [{
-          resource: '*', action: '*',
-          id: '1'
-        }] },
+        role: {
+          id: '1', name: 'admin', displayName: 'Administrator', permissions: [{
+            resource: '*', action: '*',
+            id: '1'
+          }]
+        },
         permissions: [{
           resource: '*', action: '*',
           id: '1'
@@ -58,7 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
-      
+
       currentUser.value = mockUser
       isAuthenticated.value = true
       console.log('🚀 Development bypass enabled - Auto-logged in as Dev User')
@@ -106,7 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
         firstName: data.firstName ?? '',
         lastName: data.lastName ?? '',
         fullName: [data.firstName, data.lastName].filter(Boolean).join(' ') || (data.username ?? ''),
-        avatar: `https://ui-avatars.com/api/?name=${data.firstName || ''}+${data.lastName || ''}&background=3b82f6&color=ffffff` ,
+        avatar: `https://ui-avatars.com/api/?name=${data.firstName || ''}+${data.lastName || ''}&background=3b82f6&color=ffffff`,
         phone: data.phone ?? undefined,
         role: { id: 'role', name: String(data.role || ''), displayName: String(data.role || ''), permissions: (data.permissions || []).map((p: string, idx: number) => ({ id: String(idx), resource: p.split(':')[0] || '*', action: p.split(':')[1] || '*' })) },
         permissions: (data.permissions || []).map((p: string, idx: number) => ({ id: String(idx), resource: p.split(':')[0] || '*', action: p.split(':')[1] || '*' })),
@@ -120,16 +122,16 @@ export const useAuthStore = defineStore('auth', () => {
       setCurrentUser(mappedUser)
       isAuthenticated.value = true
       startTokenRefreshTimer()
-      
+
       notificationStore.success(apiResp.message || 'Login successful', 'Welcome back!')
 
       // Optionally hydrate full user profile
-      try { await fetchCurrentUser() } catch {}
+      try { await fetchCurrentUser() } catch { }
 
       const redirect = redirectUrl.value || '/dashboard'
       clearRedirectUrl()
       router.push(redirect)
-      
+
       return mappedUser
     } catch (error: any) {
       notificationStore.error('Login failed', error.response?.data?.message || 'Invalid credentials')
@@ -158,10 +160,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Logout
-  const logout = async () => {
+  const logout = async (skipApi = false) => {
     try {
-      // Call backend logout endpoint with Authorization header
-      await apiService.post('/auth/logout')
+      if (!skipApi) {
+        // Call backend logout endpoint with Authorization header
+        await apiService.post('/auth/logout')
+      }
     } catch (error) {
       // Ignore logout errors - clear tokens on client side anyway
       console.error('Logout API call failed:', error)
@@ -171,7 +175,7 @@ export const useAuthStore = defineStore('auth', () => {
       currentUser.value = null
       isAuthenticated.value = false
       stopTokenRefreshTimer()
-      
+
       router.push('/auth/login')
       notificationStore.info('Logged out', 'You have been successfully logged out')
     }
@@ -180,7 +184,7 @@ export const useAuthStore = defineStore('auth', () => {
   // Refresh token
   const refreshToken = async (): Promise<string> => {
     const refreshTok = getRefreshToken()
-    
+
     if (!refreshTok) {
       console.error('No refresh token available')
       await logout()
@@ -192,21 +196,21 @@ export const useAuthStore = defineStore('auth', () => {
       // Use the axios instance directly to bypass the regular interceptor
       const axios = apiService.getAxiosInstance()
       const resp = await axios.post('/auth/refresh', undefined, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${refreshTok}`,
           'Content-Type': 'application/json'
         },
         // Skip the retry flag to prevent interceptor from interfering
         skipAuthRefresh: true
       } as any)
-      
+
       const apiResp = resp.data
       console.log('Refresh response:', apiResp)
-      
+
       if (!apiResp?.success) {
         throw new Error(apiResp?.error || 'Failed to refresh token')
       }
-      
+
       const data = apiResp.data
       const newToken = data.accessToken
 
@@ -215,15 +219,15 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       setToken(newToken)
-      
+
       // Update refresh token if provided
       if (data.refreshToken) {
         setRefreshToken(data.refreshToken)
       }
-      
+
       startTokenRefreshTimer()
       console.log('Token refreshed successfully')
-      
+
       return newToken
     } catch (error: any) {
       console.error('Token refresh failed:', error.response?.data || error.message)
@@ -241,16 +245,16 @@ export const useAuthStore = defineStore('auth', () => {
         throw new Error(apiResp?.error || 'Failed to load user')
       }
       const data = apiResp.data
-      
+
       // Save all user details to session storage for later use
       sessionStorage.setItem('user_details', JSON.stringify(data))
-      
+
       // Save store code to session storage
       if (data.storeCode) {
         sessionStorage.setItem('active_store_code', data.storeCode)
         localStorage.setItem('active_store_code', data.storeCode)
       }
-      
+
       const user: User = {
         id: String(data.userId ?? ''),
         email: data.email ?? '',
@@ -347,7 +351,7 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
 
-    return user.permissions.some(permission => 
+    return user.permissions.some(permission =>
       permission.resource === resource && permission.action === action
     )
   }
@@ -415,16 +419,16 @@ export const useAuthStore = defineStore('auth', () => {
   const updateUserPreferences = async (preferences: Partial<UserPreferences>): Promise<UserPreferences> => {
     const currentPreferences = getUserPreferences()
     const updatedPreferences = { ...currentPreferences, ...preferences }
-    
+
     localStorage.setItem('user_preferences', JSON.stringify(updatedPreferences))
-    
+
     try {
       const response = await apiService.put('/auth/preferences', updatedPreferences)
       const prefs = response.data.preferences
-      
+
       localStorage.setItem('user_preferences', JSON.stringify(prefs))
       notificationStore.success('Preferences updated', 'Your preferences have been saved')
-      
+
       return prefs
     } catch (error: any) {
       notificationStore.error('Failed to update preferences', error.response?.data?.message || 'Failed to update preferences')
@@ -498,7 +502,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const startTokenRefreshTimer = (): void => {
     stopTokenRefreshTimer()
-    
+
     const token = getToken()
     if (!token) return
 
@@ -536,12 +540,12 @@ export const useAuthStore = defineStore('auth', () => {
     currentUser: readonly(currentUser),
     isAuthenticated: readonly(isAuthenticated),
     isLoading: readonly(isLoading),
-    
+
     // Getters
     isLoggedIn,
     userRole,
     userPermissions,
-    
+
     // Actions
     getToken,
     initializeAuth,
