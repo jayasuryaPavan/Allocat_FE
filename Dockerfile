@@ -36,5 +36,10 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 8080
 
 # Start nginx
+# Copy environment generation script
+COPY generate-env-config.sh /docker-entrypoint.d/40-generate-env-config.sh
+RUN chmod +x /docker-entrypoint.d/40-generate-env-config.sh
+
+# Start nginx (nginx image runs scripts in /docker-entrypoint.d/ automatically)
 CMD ["nginx", "-g", "daemon off;"]
 

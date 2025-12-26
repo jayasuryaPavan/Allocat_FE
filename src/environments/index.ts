@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   staging: false,
   development: true,
-  apiUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api', // Use env var or default to local
+  apiUrl: (window as any).env?.VITE_API_BASE_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api', // Runtime > Build-time > Localhost
   appName: 'Allocat',
   version: '1.0.0',
   features: {
