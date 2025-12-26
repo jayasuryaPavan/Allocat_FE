@@ -8,20 +8,21 @@
       ]"
     >
       <div v-if="!collapsed" class="flex items-center flex-1 min-w-0">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L3 7v3l9 5 9-5V7L12 2zm0 2.18L18.09 7 12 10.82 5.91 7 12 4.18zM5 9.37l7 3.89v7.56l-7-3.89V9.37zm9 11.45v-7.56l7-3.89v7.56l-7 3.89z"/>
-          </svg>
-        </div>
-        <span class="ml-3 text-xl font-bold text-gray-900 dark:text-white truncate">Allocat</span>
+        <img 
+          src="@/assets/images/logo-icon.png" 
+          alt="Allocat mERP" 
+          class="w-10 h-10 rounded-lg shadow-md flex-shrink-0 object-contain"
+        />
+        <span class="ml-3 text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">Allocat mERP</span>
       </div>
       
       <!-- Logo when collapsed (centered) -->
-      <div v-if="collapsed" class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md">
-        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L3 7v3l9 5 9-5V7L12 2zm0 2.18L18.09 7 12 10.82 5.91 7 12 4.18zM5 9.37l7 3.89v7.56l-7-3.89V9.37zm9 11.45v-7.56l7-3.89v7.56l-7 3.89z"/>
-        </svg>
-      </div>
+      <img 
+        v-if="collapsed" 
+        src="@/assets/images/logo-icon.png" 
+        alt="Allocat mERP" 
+        class="w-10 h-10 rounded-lg shadow-md object-contain"
+      />
       
       <!-- Toggle button -->
       <button
@@ -210,6 +211,13 @@ const navigationItems = computed(() => [
     icon: ChartBarIcon,
     roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
     permissions: ['analytics:read']
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: CogIcon,
+    roles: ['*'], // Available to all authenticated users
+    permissions: []
   },
   {
     name: 'Admin',

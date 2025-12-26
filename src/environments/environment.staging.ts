@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   apiUrl: 'https://api-staging.allocat.com/api',
   wsUrl: 'wss://api-staging.allocat.com/ws',
-  appName: 'Allocat - Staging',
+  appName: 'Allocat mERP - Staging',
   version: '1.0.0-staging',
   enableDebugTools: false,
   logLevel: 'info',

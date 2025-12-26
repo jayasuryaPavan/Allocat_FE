@@ -3,7 +3,7 @@ export const environment = {
   staging: true,
   development: false,
   apiUrl: import.meta.env.VITE_API_URL || 'https://staging-api.allocat.com/api',
-  appName: 'Allocat (Staging)',
+  appName: 'Allocat mERP (Staging)',
   version: '1.0.0',
   features: {
     enableAnalytics: true,

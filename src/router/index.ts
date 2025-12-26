@@ -226,6 +226,20 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/settings',
+    component: () => import('@/layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'Settings',
+        component: () => import('@/features/settings/Settings.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      }
+    ]
+  },
+  {
     path: '/stores',
     component: () => import('@/layouts/MainLayout.vue'),
     children: [

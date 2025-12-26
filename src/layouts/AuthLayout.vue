@@ -27,7 +27,7 @@
     <!-- Footer -->
     <!-- <div class="mt-8 text-center">
       <p class="text-xs text-gray-500 dark:text-gray-400">
-        © {{ currentYear }} Allocat. All rights reserved.
+        © {{ currentYear }} Allocat mERP. All rights reserved.
       </p>
     </div> -->
   </div>

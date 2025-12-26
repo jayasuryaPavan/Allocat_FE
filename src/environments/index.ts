@@ -3,7 +3,7 @@ export const environment = {
   staging: false,
   development: true,
   apiUrl: ((window as any).env?.VITE_API_BASE_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/$/, '') + '/api', // Ensure /api suffix
-  appName: 'Allocat',
+  appName: 'Allocat mERP',
   version: '1.0.0',
   features: {
     enableAnalytics: false,

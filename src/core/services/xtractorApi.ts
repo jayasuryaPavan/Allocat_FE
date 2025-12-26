@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { environment } from '@/environments'
+import { useAuthStore } from '@/core/stores/auth'
 
 export interface XtractorTable {
   table_id: number
@@ -65,8 +66,15 @@ class XtractorApiService {
       const formData = new FormData()
       formData.append('file', file)
 
+      // Get auth token to identify user for API key lookup
+      const authStore = useAuthStore()
+      const token = authStore.getToken()
+
+      // Append token to query string so backend can fetch user's Gemini key
+      const queryParams = token ? `?authorization=${encodeURIComponent(token)}` : ''
+
       const response = await axios.post<XtractorResponse>(
-        `${this.baseUrl}/v1/extract`,
+        `${this.baseUrl}/v1/extract${queryParams}`,
         formData,
         {
           headers: {

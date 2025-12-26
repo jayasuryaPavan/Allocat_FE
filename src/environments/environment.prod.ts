@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   apiUrl: 'https://allocat-gateway-140766457860.northamerica-northeast2.run.app/api',
   wsUrl: 'wss://allocat-gateway-140766457860.northamerica-northeast2.run.app/ws',
-  appName: 'Allocat',
+  appName: 'Allocat mERP',
   version: '1.0.0',
   enableDebugTools: false,
   logLevel: 'error',
