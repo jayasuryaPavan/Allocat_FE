@@ -3,16 +3,16 @@
   <button
     v-if="!isOpen"
     @click="openChat"
-    class="fixed bottom-6 right-6 z-50 bg-white dark:bg-gray-900 rounded-full p-3 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    class="fixed bottom-6 right-6 z-50 bg-white/40 dark:bg-gray-900/40 backdrop-blur-glass rounded-full p-3 shadow-glass shadow-glass-glow transition-all duration-300 hover:scale-110 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
     aria-label="Open InvenGadu Chat"
   >
-    <div v-if="!isTyping" class="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+    <div v-if="!isTyping" class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-glow-sm">
       <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2L3 7v3l9 5 9-5V7L12 2zm0 2.18L18.09 7 12 10.82 5.91 7 12 4.18zM5 9.37l7 3.89v7.56l-7-3.89V9.37zm9 11.45v-7.56l7-3.89v7.56l-7 3.89z"/>
       </svg>
     </div>
-    <div v-else class="w-6 h-6 flex items-center justify-center">
-      <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+    <div v-else class="w-8 h-8 flex items-center justify-center">
+      <div class="animate-spin rounded-full h-5 w-5 border-2 border-primary-500 border-t-transparent"></div>
     </div>
   </button>
 
@@ -27,24 +27,28 @@
   >
     <div
       v-if="isOpen"
-      class="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border border-gray-200 dark:border-gray-700"
+      class="chat-glass fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-6rem)] rounded-2xl shadow-glass shadow-glass-glow flex flex-col overflow-hidden"
     >
       <!-- Chat Header -->
-      <div class="bg-blue-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+      <div 
+        @click="closeChat"
+        class="bg-primary-600/10 backdrop-blur-md text-white py-2 px-3 flex items-center justify-between shadow-glow-sm relative cursor-pointer hover:bg-primary-600/15 transition-colors"
+      >
+        <div class="absolute inset-x-0 bottom-0 h-[1px] bg-white/20"></div>
         <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+          <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-glow-sm">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L3 7v3l9 5 9-5V7L12 2zm0 2.18L18.09 7 12 10.82 5.91 7 12 4.18zM5 9.37l7 3.89v7.56l-7-3.89V9.37zm9 11.45v-7.56l7-3.89v7.56l-7 3.89z"/>
             </svg>
           </div>
           <div>
-            <h3 class="font-semibold">InvenGadu</h3>
-            <p class="text-xs text-blue-100">Your AI Inventory Assistant</p>
+            <h3 class="font-bold text-sm leading-tight text-primary-600 dark:text-primary-400">InvenGadu</h3>
+            <p class="text-[10px] text-primary-500/80 dark:text-primary-400/70 font-semibold uppercase tracking-wide">AI Agent</p>
           </div>
         </div>
         <button
           @click="closeChat"
-          class="text-white hover:text-blue-200 focus:outline-none"
+          class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 focus:outline-none"
           aria-label="Close Chat"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,7 +65,7 @@
       <!-- Messages Area -->
       <div
         ref="messagesContainer"
-        class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900"
+        class="flex-1 overflow-y-auto p-4 space-y-4 bg-transparent"
       >
         <!-- Welcome Message -->
         <div v-if="messages.length === 0" class="text-center py-8">
@@ -104,10 +108,10 @@
         >
           <div
             :class="[
-              'max-w-[80%] rounded-lg px-4 py-2',
+              'max-w-[85%] rounded-2xl px-4 py-3 shadow-sm transition-all duration-300',
               message.role === 'user'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600'
+                ? 'bg-primary-600 text-white shadow-glow-sm ml-auto rounded-tr-none'
+                : 'bg-white/40 dark:bg-gray-800/40 backdrop-blur-md text-gray-800 dark:text-white border border-white/20 dark:border-white/10 rounded-tl-none'
             ]"
           >
             <p class="text-sm whitespace-pre-wrap">{{ message.content }}</p>
@@ -135,19 +139,19 @@
       </div>
 
       <!-- Input Area -->
-      <div class="border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
+      <div class="p-4 bg-white/10 backdrop-blur-glass-lg border-t border-white/10">
         <form @submit.prevent="sendMessage" class="flex space-x-2">
           <input
             v-model="inputMessage"
             type="text"
             placeholder="Ask about inventory..."
-            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            class="flex-1 px-4 py-3 bg-white/5 dark:bg-black/20 border-white/20 dark:border-white/10 rounded-xl focus:ring-primary-500 focus:border-primary-500 dark:text-white placeholder-gray-400 text-sm transition-all"
             :disabled="isTyping"
           />
           <button
             type="submit"
             :disabled="!inputMessage.trim() || isTyping"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 hover:shadow-glow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-glow-sm"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -165,12 +169,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { invenGaduApi } from '@/core/services/invenGaduApi'
+import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import type { ChatMessage } from '@/core/types/chat'
-import { useNotificationStore } from '@/core/stores/notification'
-
-const notificationStore = useNotificationStore()
+import { invenGaduApi } from '@/core/services/invenGaduApi'
 
 // State
 const isOpen = ref(false)
@@ -188,10 +189,7 @@ const quickSuggestions = [
 ]
 
 // Computed
-const hasUnreadMessages = computed(() => {
-  // Could implement unread message tracking
-  return false
-})
+// hasUnreadMessages removed as it was unused
 
 // Methods
 const openChat = () => {

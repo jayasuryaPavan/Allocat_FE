@@ -5,7 +5,7 @@
       <button @click="fetchStores" class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Refresh</button>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="card overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead class="bg-gray-50 dark:bg-gray-700">
           <tr>

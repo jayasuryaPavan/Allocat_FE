@@ -13,7 +13,7 @@
       <div class="mt-4 flex space-x-2 md:ml-4 md:mt-0">
         <button
           @click="showImportModal = true"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          class="btn-glass-blue inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -23,7 +23,7 @@
         <button
           v-if="enablePdfExtraction"
           @click="showPdfExtractorModal = true"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          class="btn-glass-purple inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
         >
           <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -35,7 +35,7 @@
 
     <!-- Inventory Stats -->
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+      <div class="card overflow-hidden">
         <div class="p-5">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+      <div class="card overflow-hidden">
         <div class="p-5">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -71,7 +71,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+      <div class="card overflow-hidden">
         <div class="p-5">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -89,7 +89,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+      <div class="card overflow-hidden">
         <div class="p-5">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -109,7 +109,7 @@
     </div>
 
     <!-- Inventory Table -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+    <div class="card">
       <div class="px-4 py-5 sm:p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">Inventory Items</h3>
@@ -283,11 +283,11 @@
     <div v-if="showImportModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 transition-opacity" @click="showImportModal = false">
-          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+          <div class="absolute inset-0 bg-gray-500/40 backdrop-blur-sm"></div>
         </div>
 
-        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="chat-glass inline-block align-bottom text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full rounded-2xl shadow-glass shadow-glass-glow">
+          <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
               <div class="w-full">
                 <div class="flex items-center justify-between mb-4">

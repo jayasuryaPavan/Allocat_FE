@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+    <div class="card">
       <div class="px-4 py-5 sm:p-6">
         <div class="text-center">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

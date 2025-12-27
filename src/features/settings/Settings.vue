@@ -122,7 +122,15 @@ async function loadKeyStatus() {
     hasKey.value = data.hasKey
     maskedKey.value = data.maskedKey || ''
   } catch (error: any) {
-    notification.error('Failed to load settings', error.response?.data?.message)
+    // Check if this is a 404 (no key configured yet) - this is expected for new users
+    if (error.response?.status === 404) {
+      hasKey.value = false
+      maskedKey.value = ''
+      // Show a friendly info message instead of an error
+      notification.info('No Gemini API Key', 'Add your Gemini API key below to enable AI features like InvenGadu.')
+    } else {
+      notification.error('Failed to load settings', error.response?.data?.message)
+    }
   } finally {
     loading.value = false
   }

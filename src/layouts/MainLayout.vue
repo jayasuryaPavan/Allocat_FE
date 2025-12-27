@@ -1,11 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- Sidebar -->
+  <div class="min-h-screen relative z-10">
     <div 
       :class="[
-        'fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ease-in-out',
+        'fixed inset-y-0 left-0 z-50 bg-white/40 dark:bg-gray-900/40 backdrop-blur-glass shadow-glass-glow transition-all duration-300 ease-in-out',
         sidebarCollapsed 
-          ? '-translate-x-full lg:translate-x-0 lg:w-16' 
+          ? '-translate-x-full lg:translate-x-0 lg:w-20' 
           : 'translate-x-0 w-64'
       ]"
     >
@@ -19,7 +18,7 @@
     <div 
       :class="[
         'flex-1 transition-all duration-300 ease-in-out',
-        sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+        sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
       ]"
     >
       <!-- Header -->

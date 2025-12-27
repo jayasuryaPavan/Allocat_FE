@@ -33,7 +33,7 @@
     </div>
 
     <!-- Search and Filters -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+    <div class="card p-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <input
           v-model="searchTerm"
@@ -64,7 +64,7 @@
     </div>
 
     <!-- Customers Table -->
-    <div v-else class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div v-else class="card overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead class="bg-gray-50 dark:bg-gray-700">
