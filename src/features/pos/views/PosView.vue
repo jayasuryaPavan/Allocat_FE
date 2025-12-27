@@ -121,11 +121,11 @@ const handlePaymentComplete = async (paymentData: any) => {
 </script>
 
 <template>
-  <div class="h-[calc(100vh-6rem)] flex flex-col md:flex-row gap-4 p-4 bg-gray-100">
+  <div class="h-[calc(100vh-6rem)] flex flex-col md:flex-row gap-4 p-4">
     <!-- Left Panel: Product Search & Actions -->
     <div class="w-full md:w-2/3 flex flex-col gap-4">
       <!-- Top Bar: Customer & Search -->
-      <div class="bg-white p-4 rounded-lg shadow-sm flex flex-col md:flex-row gap-4 items-center">
+      <div class="card p-4 flex flex-col md:flex-row gap-4 items-center">
         <div class="w-full md:w-1/3">
           <CustomerSelector v-model="selectedCustomer" />
         </div>
@@ -135,7 +135,7 @@ const handlePaymentComplete = async (paymentData: any) => {
       </div>
 
       <!-- Main Content Area (Placeholder for Grid/Quick Keys) -->
-      <div class="flex-1 bg-white rounded-lg shadow-sm p-4 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200">
+      <div class="flex-1 card p-4 flex items-center justify-center text-gray-400 border-2 border-dashed border-primary-200 dark:border-primary-800">
         <div class="text-center">
           <i class="fas fa-th text-4xl mb-2"></i>
           <p>Quick Keys / Product Grid</p>
@@ -143,46 +143,46 @@ const handlePaymentComplete = async (paymentData: any) => {
         </div>
       </div>
 
-      <!-- Action Buttons - Touch Optimized -->
+      <!-- Action Buttons - Touch Optimized with Glass Effect -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 touch-grid">
         <button 
-          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all"
-          :class="{'opacity-50 cursor-not-allowed': !posStore.hasItems, 'hover:bg-gray-50 hover:border-blue-400': posStore.hasItems}"
+          class="pos-action-btn"
+          :class="{'opacity-50 cursor-not-allowed': !posStore.hasItems}"
           @click="showDiscountDialog = true"
           :disabled="!posStore.hasItems"
         >
           <i class="fas fa-percent text-blue-500 text-2xl"></i>
-          <span class="text-base">Discount</span>
+          <span class="text-base font-semibold">Discount</span>
         </button>
         <button 
-          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all"
-          :class="{'opacity-50 cursor-not-allowed': !posStore.hasItems, 'hover:bg-gray-50 hover:border-orange-400': posStore.hasItems}"
+          class="pos-action-btn"
+          :class="{'opacity-50 cursor-not-allowed': !posStore.hasItems}"
           @click="handleSuspend"
           :disabled="!posStore.hasItems"
         >
           <i class="fas fa-pause text-orange-500 text-2xl"></i>
-          <span class="text-base">Suspend</span>
+          <span class="text-base font-semibold">Suspend</span>
         </button>
         <button 
-          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all hover:bg-gray-50 hover:border-green-400"
+          class="pos-action-btn"
           @click="showHeldOrdersModal = true"
         >
           <i class="fas fa-undo text-green-500 text-2xl"></i>
-          <span class="text-base">Recall</span>
+          <span class="text-base font-semibold">Recall</span>
         </button>
         <button 
-          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all hover:bg-gray-50 hover:border-orange-400"
+          class="pos-action-btn"
           @click="showReturnModal = true"
         >
           <i class="fas fa-undo text-orange-500 text-2xl"></i>
-          <span class="text-base">Return</span>
+          <span class="text-base font-semibold">Return</span>
         </button>
         <button 
-          class="touch-button pos-touch-target bg-white border-2 border-gray-300 rounded-xl shadow-md active:shadow-sm active:scale-95 text-gray-700 font-semibold flex flex-col items-center justify-center gap-2 touch-no-select transition-all hover:bg-gray-50 hover:border-purple-400 md:col-span-2"
+          class="pos-action-btn md:col-span-2"
           @click="$router.push('/pos/sales')"
         >
           <i class="fas fa-history text-purple-500 text-2xl"></i>
-          <span class="text-base">History</span>
+          <span class="text-base font-semibold">History</span>
         </button>
       </div>
     </div>
@@ -192,12 +192,12 @@ const handlePaymentComplete = async (paymentData: any) => {
       <CartSummary class="h-full">
         <template #actions>
           <button
-            class="w-full touch-button pos-touch-target bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-2xl font-bold rounded-xl shadow-lg active:shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 touch-no-select"
+            class="w-full btn-glass-blue text-white text-xl font-bold rounded-xl py-4 shadow-lg active:shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3"
             :disabled="!posStore.hasItems"
             @click="handleCheckout"
           >
             <span>Checkout</span>
-            <i class="fas fa-chevron-right text-xl"></i>
+            <i class="fas fa-chevron-right text-lg"></i>
           </button>
         </template>
       </CartSummary>

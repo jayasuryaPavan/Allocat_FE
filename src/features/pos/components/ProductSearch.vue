@@ -115,13 +115,13 @@ const handleFocus = () => {
   <div class="relative w-full">
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-        <i class="fas fa-search text-gray-400 text-xl"></i>
+        <i class="fas fa-search text-gray-400 dark:text-gray-500 text-xl"></i>
       </div>
       <input
         ref="searchInput"
         v-model="searchQuery"
         type="text"
-        class="touch-input block w-full pl-12 pr-4 border-2 border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-lg font-medium transition duration-150 ease-in-out"
+        class="touch-input block w-full pl-12 pr-4 border border-gray-200/50 dark:border-gray-600/50 rounded-xl leading-5 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 text-lg font-medium transition duration-150 ease-in-out"
         placeholder="Scan barcode or search product..."
         @input="handleSearch"
         @keydown.enter.prevent="handleEnter"
