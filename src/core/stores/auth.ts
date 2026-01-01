@@ -225,6 +225,22 @@ export const useAuthStore = defineStore('auth', () => {
         setRefreshToken(data.refreshToken)
       }
 
+      // IMPORTANT: Update the current user's role from the refresh response
+      // This fixes the issue where the role becomes VIEWER after refresh
+      if (currentUser.value && data.role) {
+        const updatedUser: User = {
+          ...currentUser.value,
+          role: {
+            id: currentUser.value.role?.id || 'role',
+            name: data.role,
+            displayName: data.role,
+            permissions: currentUser.value.role?.permissions || []
+          }
+        }
+        setCurrentUser(updatedUser)
+        console.log('Updated user role from refresh response:', data.role)
+      }
+
       startTokenRefreshTimer()
       console.log('Token refreshed successfully')
 

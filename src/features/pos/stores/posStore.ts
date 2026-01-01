@@ -39,7 +39,7 @@ export const usePosStore = defineStore('pos', () => {
                 baseURL: error.config?.baseURL,
                 fullURL: `${error.config?.baseURL}${error.config?.url}`
             })
-            const errorMessage = error.response?.status === 404 
+            const errorMessage = error.response?.status === 404
                 ? 'POS endpoint not found. Please ensure the backend is running on port 8080.'
                 : error.response?.data?.message || error.message || 'Unknown error'
             notificationStore.error('Failed to create cart', errorMessage)
@@ -79,6 +79,54 @@ export const usePosStore = defineStore('pos', () => {
             }
         } catch (error: any) {
             notificationStore.error('Failed to add item', error.response?.data?.message || 'Unknown error')
+            throw error
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    const addCustomItem = async (cartId: string, item: {
+        description: string,
+        unitPrice: number,
+        quantity: number,
+        taxExempt: boolean
+    }) => {
+        isLoading.value = true
+        try {
+            // TODO: Add API call later - for now, add item locally
+            // Add item locally to cart state
+            if (currentCart.value) {
+                const taxRate = item.taxExempt ? 0 : 0.13 // 13% HST default
+                const subtotal = item.unitPrice * item.quantity
+                const taxAmount = item.taxExempt ? 0 : (subtotal * taxRate)
+
+                const newItem = {
+                    itemId: `custom-${Date.now()}`,
+                    productId: null,
+                    productCode: 'CUSTOM',
+                    productName: item.description,
+                    barcode: null,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice,
+                    subtotal: subtotal,
+                    taxAmount: taxAmount,
+                    discountAmount: 0,
+                    total: subtotal + taxAmount,
+                    taxExempt: item.taxExempt
+                }
+                currentCart.value.items.push(newItem as any)
+
+                // Recalculate cart totals
+                const cartSubtotal = currentCart.value.items.reduce((acc, i) => acc + (i.unitPrice * i.quantity), 0)
+                const cartTaxAmount = currentCart.value.items.reduce((acc, i) => acc + i.taxAmount, 0)
+                currentCart.value.subtotal = cartSubtotal
+                currentCart.value.taxAmount = cartTaxAmount
+                currentCart.value.total = cartSubtotal + cartTaxAmount - currentCart.value.discountAmount
+            } else {
+                throw new Error('No cart initialized')
+            }
+        } catch (error: any) {
+            notificationStore.error('Failed to add item', error.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -303,6 +351,7 @@ export const usePosStore = defineStore('pos', () => {
         createCart,
         getCart,
         addItem,
+        addCustomItem,
         updateItemQuantity,
         removeItem,
         applyDiscount,

@@ -8,9 +8,9 @@ import ProductSearch from '../components/ProductSearch.vue'
 import CartSummary from '../components/CartSummary.vue'
 import PaymentModal from '../components/PaymentModal.vue'
 import DiscountDialog from '../components/DiscountDialog.vue'
-import CustomerSelector from '../components/CustomerSelector.vue'
 import HeldOrdersModal from '../components/HeldOrdersModal.vue'
 import ReturnOrderModal from '../components/ReturnOrderModal.vue'
+import QuickAddItemModal from '../components/QuickAddItemModal.vue'
 import type { CheckoutRequest } from '../types'
 
 const posStore = usePosStore()
@@ -22,7 +22,8 @@ const showPaymentModal = ref(false)
 const showDiscountDialog = ref(false)
 const showHeldOrdersModal = ref(false)
 const showReturnModal = ref(false)
-const selectedCustomer = ref<any>(null)
+const showQuickAddModal = ref(false)
+const isQuickAddTaxExempt = ref(false)
 
 const cart = computed(() => posStore.currentCart)
 const activeShift = computed(() => shiftStore.activeShift)
@@ -83,15 +84,19 @@ const handleSuspend = async () => {
   }
   
   try {
-    await posStore.holdOrder(cart.value.cartId, selectedCustomer.value?.id, 'Suspended by cashier')
-    selectedCustomer.value = null
+    await posStore.holdOrder(cart.value.cartId, undefined, 'Suspended by cashier')
     // Create new cart immediately
-    const storeId = 1
-    const cashierId = Number(authStore.currentUser?.id) || 1
+    const storeId = getStoreId()
+    const cashierId = getUserId()
     await posStore.createCart(storeId, cashierId)
   } catch (error) {
     // Error handled in store
   }
+}
+
+const handleOpenQuickAdd = (taxExempt: boolean) => {
+  isQuickAddTaxExempt.value = taxExempt
+  showQuickAddModal.value = true
 }
 
 const handlePaymentComplete = async (paymentData: any) => {
@@ -99,20 +104,18 @@ const handlePaymentComplete = async (paymentData: any) => {
 
   const checkoutRequest: CheckoutRequest = {
     cartId: cart.value.cartId,
-    customerId: selectedCustomer.value?.id,
+    customerId: undefined,
     payments: paymentData.payments,
     notes: paymentData.notes,
-    emailReceipt: !!selectedCustomer.value?.email
+    emailReceipt: false
   }
 
   try {
-    const order = await posStore.checkout(checkoutRequest)
+    await posStore.checkout(checkoutRequest)
     showPaymentModal.value = false
-    selectedCustomer.value = null
-    // Optionally show receipt or success message with order details
-    // For now, we just start a new cart
-    const storeId = 1
-    const cashierId = Number(authStore.currentUser?.id) || 1
+    // Start a new cart
+    const storeId = getStoreId()
+    const cashierId = getUserId()
     await posStore.createCart(storeId, cashierId)
   } catch (error) {
     // Error handled in store
@@ -124,14 +127,29 @@ const handlePaymentComplete = async (paymentData: any) => {
   <div class="h-[calc(100vh-6rem)] flex flex-col md:flex-row gap-4 p-4">
     <!-- Left Panel: Product Search & Actions -->
     <div class="w-full md:w-2/3 flex flex-col gap-4">
-      <!-- Top Bar: Customer & Search -->
-      <div class="card p-4 flex flex-col md:flex-row gap-4 items-center">
-        <div class="w-full md:w-1/3">
-          <CustomerSelector v-model="selectedCustomer" />
-        </div>
-        <div class="w-full md:w-2/3">
-          <ProductSearch @product-selected="handleProductSelected" />
-        </div>
+      <!-- Top Bar: Product Search (Full Width) -->
+      <div class="card p-4">
+        <ProductSearch @product-selected="handleProductSelected" />
+      </div>
+
+      <!-- Quick Add Buttons - Tax Exempt and Taxable -->
+      <div class="grid grid-cols-2 gap-4">
+        <button 
+          class="pos-action-btn !min-h-[100px] border-2 border-green-400/30 hover:border-green-500/50"
+          @click="handleOpenQuickAdd(true)"
+        >
+          <i class="fas fa-receipt text-green-500 text-3xl"></i>
+          <span class="text-lg font-bold text-gray-900 dark:text-white">Tax Exempt</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400">Lottery, Gift Cards</span>
+        </button>
+        <button 
+          class="pos-action-btn !min-h-[100px] border-2 border-blue-400/30 hover:border-blue-500/50"
+          @click="handleOpenQuickAdd(false)"
+        >
+          <i class="fas fa-dollar-sign text-blue-500 text-3xl"></i>
+          <span class="text-lg font-bold text-gray-900 dark:text-white">Taxable Item</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400">Manual Price Entry</span>
+        </button>
       </div>
 
       <!-- Main Content Area (Placeholder for Grid/Quick Keys) -->
@@ -220,8 +238,7 @@ const handlePaymentComplete = async (paymentData: any) => {
     <HeldOrdersModal
       :is-open="showHeldOrdersModal"
       @close="showHeldOrdersModal = false"
-      @resume="(order) => { 
-        selectedCustomer = order.customer 
+      @resume="() => { 
         // Cart is already updated by store action
       }"
     />
@@ -232,6 +249,12 @@ const handlePaymentComplete = async (paymentData: any) => {
       @return-processed="() => {
         // Optional: Refresh or reload if needed
       }"
+    />
+
+    <QuickAddItemModal
+      :is-open="showQuickAddModal"
+      :is-tax-exempt="isQuickAddTaxExempt"
+      @close="showQuickAddModal = false"
     />
   </div>
 </template>

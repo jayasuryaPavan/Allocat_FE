@@ -122,7 +122,7 @@ const handleFocus = () => {
         v-model="searchQuery"
         type="text"
         class="touch-input block w-full pl-12 pr-4 border border-gray-200/50 dark:border-gray-600/50 rounded-xl leading-5 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 text-lg font-medium transition duration-150 ease-in-out"
-        placeholder="Scan barcode or search product..."
+        placeholder="Search product..."
         @input="handleSearch"
         @keydown.enter.prevent="handleEnter"
         @blur="closeResults"
