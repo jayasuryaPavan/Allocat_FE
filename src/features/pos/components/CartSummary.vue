@@ -39,15 +39,15 @@ const handleClearCart = () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-white shadow-sm rounded-lg border border-gray-200">
+  <div class="flex flex-col h-full card">
     <!-- Header -->
-    <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-lg">
-      <h3 class="text-lg font-semibold text-gray-800">
+    <div class="p-4 border-b border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
         <i class="fas fa-shopping-cart mr-2 text-blue-500"></i>Current Order
       </h3>
       <button 
         v-if="items.length > 0"
-        class="touch-button min-h-[48px] px-4 py-2 text-base text-red-500 hover:text-red-700 active:text-red-800 active:bg-red-50 font-semibold rounded-lg transition-all touch-no-select"
+        class="touch-button min-h-[48px] px-4 py-2 text-base text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 active:text-red-800 active:bg-red-50 dark:active:bg-red-900/20 font-semibold rounded-lg transition-all touch-no-select"
         @click="handleClearCart"
       >
         Clear All
@@ -73,21 +73,21 @@ const handleClearCart = () => {
     </div>
 
     <!-- Footer / Totals -->
-    <div class="p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+    <div class="p-4 border-t border-gray-200/50 dark:border-gray-700/50">
       <div class="space-y-3 mb-6">
-        <div class="flex justify-between text-lg text-gray-600">
+        <div class="flex justify-between text-lg text-gray-600 dark:text-gray-300">
           <span class="font-medium">Subtotal</span>
           <span class="font-semibold">{{ formatCurrency(subtotal) }}</span>
         </div>
-        <div class="flex justify-between text-lg text-gray-600">
+        <div class="flex justify-between text-lg text-gray-600 dark:text-gray-300">
           <span class="font-medium">Tax</span>
           <span class="font-semibold">{{ formatCurrency(tax) }}</span>
         </div>
-        <div v-if="discount > 0" class="flex justify-between text-lg text-green-600 font-semibold">
+        <div v-if="discount > 0" class="flex justify-between text-lg text-green-600 dark:text-green-400 font-semibold">
           <span>Discount</span>
           <span>-{{ formatCurrency(discount) }}</span>
         </div>
-        <div class="flex justify-between text-3xl font-bold text-gray-900 pt-3 border-t-2 border-gray-300">
+        <div class="flex justify-between text-3xl font-bold text-gray-900 dark:text-white pt-3 border-t-2 border-gray-300/50 dark:border-gray-600/50">
           <span>Total</span>
           <span>{{ formatCurrency(total) }}</span>
         </div>

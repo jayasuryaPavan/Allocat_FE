@@ -104,7 +104,11 @@ export class ApiService {
         } else if (error.response?.status === 403) {
           notificationStore.error('Access Denied', 'You do not have permission to perform this action.')
         } else if (error.response?.status === 404) {
-          notificationStore.error('Not Found', 'The requested resource was not found.')
+          // Skip notification for gemini-key endpoint - it's handled by Settings page
+          const url = error.config?.url || ''
+          if (!url.includes('/settings/gemini-key')) {
+            notificationStore.error('Not Found', 'The requested resource was not found.')
+          }
         }
 
         return Promise.reject(error)

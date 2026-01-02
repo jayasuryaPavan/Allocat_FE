@@ -3,7 +3,7 @@ export const environment = {
   development: true,
   apiUrl: 'http://localhost:8080/api', // Use relative URL to leverage Vite proxy in development
   wsUrl: 'ws://localhost:8080/ws',
-  appName: 'Allocat',
+  appName: 'Allocat mERP',
   version: '1.0.0',
   enableDebugTools: true,
   logLevel: 'debug',

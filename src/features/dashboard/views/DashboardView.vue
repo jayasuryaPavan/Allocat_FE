@@ -13,9 +13,9 @@
       <div class="mt-4 flex md:mt-0 md:ml-4">
         <button
           type="button"
-          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+          class="btn-glass-green inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
         >
-          <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           Export
@@ -28,7 +28,7 @@
       <div
         v-for="stat in stats"
         :key="stat.name"
-        class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
+        class="card overflow-hidden"
       >
         <div class="p-5">
           <div class="flex items-center">
@@ -56,7 +56,7 @@
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+        <div class="bg-blue-100/50 dark:bg-gray-700 px-5 py-3">
           <div class="text-sm">
             <a
               :href="stat.href"
@@ -72,7 +72,7 @@
     <!-- Charts section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Sales chart -->
-      <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="card">
         <div class="px-4 py-5 sm:p-6">
           <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
             Sales Overview
@@ -91,7 +91,7 @@
       </div>
 
       <!-- Recent activity -->
-      <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="card">
         <div class="px-4 py-5 sm:p-6">
           <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
             Recent Activity
@@ -108,7 +108,7 @@
                   <div class="relative flex space-x-3">
                     <div>
                       <span :class="[
-                        'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-gray-800',
+                        'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-blue-50 dark:ring-gray-800',
                         activity.iconBg
                       ]">
                         <component
@@ -140,7 +140,7 @@
     </div>
 
     <!-- Quick actions -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+    <div class="card">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
           Quick Actions
@@ -150,7 +150,7 @@
             v-for="action in quickActions"
             :key="action.name"
             @click="handleQuickAction(action.href)"
-            class="relative group bg-white dark:bg-gray-700 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
+            class="relative group bg-blue-50/50 dark:bg-gray-700 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-2xl hover:bg-blue-100/50 dark:hover:bg-gray-600 transition-all"
           >
             <div>
               <span :class="[

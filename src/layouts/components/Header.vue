@@ -1,57 +1,48 @@
 <template>
-  <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-    <div class="flex items-center justify-between h-16 px-4">
+  <header class="bg-white/40 dark:bg-gray-900/40 backdrop-blur-glass shadow-glass-glow sticky top-0 z-40">
+    <div class="flex items-center justify-between h-16 px-6">
       <!-- Left side -->
       <div class="flex items-center">
         <!-- Mobile menu button -->
         <button
           @click="$emit('toggle-sidebar')"
-          class="lg:hidden touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 transition-colors touch-no-select"
+          class="lg:hidden touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-xl text-gray-400 hover:text-primary-500 hover:bg-primary-500/10 dark:hover:bg-primary-500/20 active:bg-primary-500/20 transition-all touch-no-select"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
-        <!-- Desktop sidebar toggle -->
-        <!-- <button
-          @click="$emit('toggle-sidebar')"
-          class="hidden lg:block p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button> -->
-
         <!-- Breadcrumb -->
-        <nav class="hidden md:flex ml-4" aria-label="Breadcrumb">
+        <nav class="hidden md:flex" aria-label="Breadcrumb">
           <ol class="flex items-center space-x-2">
             <li>
-              <router-link to="/dashboard" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+              <router-link 
+                to="/dashboard" 
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-primary-500 hover:bg-primary-500/10 dark:text-gray-400 dark:hover:text-primary-400 transition-all outline-none focus-visible:ring-0"
+              >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </router-link>
             </li>
-            <li v-for="(crumb, index) in breadcrumbs" :key="index">
-              <div class="flex items-center">
-                <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">{{ crumb }}</span>
-              </div>
+            <li v-for="(crumb, index) in breadcrumbs" :key="index" class="flex items-center">
+              <svg class="w-4 h-4 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">{{ crumb }}</span>
             </li>
           </ol>
         </nav>
       </div>
 
       <!-- Right side -->
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2 md:space-x-4">
         <!-- Change Store button for SUPER_ADMIN -->
         <div v-if="isSuperAdmin" class="hidden md:block">
           <button 
             @click="openStoreModal" 
-            class="touch-button px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 active:scale-95 transition-all shadow-sm font-medium touch-no-select"
+            class="touch-button px-4 py-2 text-sm bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 border border-primary-500/30 rounded-xl hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white active:scale-95 transition-all shadow-glow-sm font-bold tracking-wide touch-no-select"
           >
             Change store
           </button>
@@ -61,7 +52,7 @@
         <!-- Theme toggle -->
         <button
           @click="$emit('toggle-theme')"
-          class="touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 transition-colors touch-no-select"
+          class="touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-xl text-gray-400 hover:text-primary-500 hover:bg-primary-500/10 dark:hover:bg-primary-500/20 active:bg-primary-500/20 transition-all touch-no-select"
           :title="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
         >
           <svg v-if="isDarkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,26 +67,29 @@
         <div class="relative">
           <button
             @click="toggleNotifications"
-            class="touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 transition-colors relative touch-no-select"
+            class="touch-button min-w-[48px] min-h-[48px] flex items-center justify-center rounded-xl text-gray-400 hover:text-primary-500 hover:bg-primary-500/10 dark:hover:bg-primary-500/20 active:bg-primary-500/20 transition-all relative touch-no-select"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h5l-5-5v5zM15 7h5l-5-5v5zM4 7h5l-5 5V7z" />
             </svg>
-            <span v-if="hasUnreadNotifications" class="absolute top-2 right-2 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800"></span>
+            <span v-if="hasUnreadNotifications" class="absolute top-2 right-2 h-3 w-3 bg-accent-pink rounded-full ring-2 ring-white dark:ring-gray-900 animate-pulse"></span>
           </button>
 
-          <!-- Notifications dropdown -->
-          <div
-            v-if="showNotifications"
-            class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50"
-          >
-            <div class="p-4">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Notifications</h3>
-              <div class="mt-2 space-y-2">
-                <div class="text-sm text-gray-500 dark:text-gray-400">No new notifications</div>
+          <!-- Notifications dropdown - Teleported to body for proper backdrop-filter -->
+          <Teleport to="body">
+            <div
+              v-if="showNotifications"
+              class="dropdown-glass fixed rounded-2xl z-[9999] overflow-hidden"
+              :style="notificationsDropdownStyle"
+            >
+              <div class="p-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Notifications</h3>
+                <div class="mt-2 space-y-2">
+                  <div class="text-sm text-gray-500 dark:text-gray-400">No new notifications</div>
+                </div>
               </div>
             </div>
-          </div>
+          </Teleport>
         </div>
 
         <!-- Development Toggle (only in development) -->
@@ -145,42 +139,45 @@
             </svg>
           </button>
 
-          <!-- User dropdown -->
-          <div
-            v-if="showUserMenu"
-            class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
-          >
-            <div class="py-1">
-              <router-link
-                to="/profile"
-                class="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 touch-no-select active:bg-gray-200"
-              >
-                Profile
-              </router-link>
-              <router-link
-                to="/settings"
-                class="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 touch-no-select active:bg-gray-200"
-              >
-                Settings
-              </router-link>
-              <div class="border-t border-gray-100 dark:border-gray-700"></div>
-              <button
-                @click="$emit('logout')"
-                class="block w-full text-left px-4 py-3 text-base font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 touch-no-select active:bg-red-100"
-              >
-                Sign out
-              </button>
+          <!-- User dropdown - Teleported to body for proper backdrop-filter -->
+          <Teleport to="body">
+            <div
+              v-if="showUserMenu"
+              class="dropdown-glass fixed rounded-xl z-[9999] overflow-hidden"
+              :style="userMenuDropdownStyle"
+            >
+              <div class="py-1">
+                <router-link
+                  to="/profile"
+                  class="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-primary-500/10 dark:text-gray-300 dark:hover:bg-primary-500/20 touch-no-select"
+                >
+                  Profile
+                </router-link>
+                <router-link
+                  to="/settings"
+                  class="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-primary-500/10 dark:text-gray-300 dark:hover:bg-primary-500/20 touch-no-select"
+                >
+                  Settings
+                </router-link>
+                <div class="border-t border-gray-200/50 dark:border-white/10"></div>
+                <button
+                  @click="$emit('logout')"
+                  class="block w-full text-left px-4 py-3 text-base font-medium text-red-600 hover:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 touch-no-select"
+                >
+                  Sign out
+                </button>
+              </div>
             </div>
-          </div>
+          </Teleport>
         </div>
       </div>
     </div>
 
     <!-- Store selection modal -->
     <div v-if="showStoreModal" class="fixed inset-0 z-50">
-      <div class="absolute inset-0 bg-black/50" @click="closeStoreModal"></div>
+      <div class="absolute inset-0 bg-gray-500/60 backdrop-blur-md" @click="closeStoreModal"></div>
       <div class="absolute inset-0 flex items-center justify-center p-4">
-        <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <div class="card w-full max-w-md">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <h4 class="text-sm font-medium text-gray-900 dark:text-white">Select Store</h4>
             <button @click="closeStoreModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -286,6 +283,19 @@ const breadcrumbs = computed(() => {
     return segment.charAt(0).toUpperCase() + segment.slice(1)
   })
 })
+
+// Dropdown positioning for teleported elements
+const notificationsDropdownStyle = computed(() => ({
+  top: '64px',
+  right: '180px',
+  width: '320px'
+}))
+
+const userMenuDropdownStyle = computed(() => ({
+  top: '64px', 
+  right: '24px',
+  width: '224px'
+}))
 
 // Methods
 const toggleUserMenu = () => {

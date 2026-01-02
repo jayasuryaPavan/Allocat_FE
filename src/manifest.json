@@ -1,7 +1,7 @@
 {
-  "name": "Allocat",
-  "short_name": "Allocat",
-  "description": "Complete Point of Sale and Inventory Management Solution",
+  "name": "Allocat mERP",
+  "short_name": "Allocat mERP",
+  "description": "Micro ERP & AI Automation - Complete Point of Sale and Inventory Management Solution",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,7 +9,11 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["business", "productivity", "utilities"],
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "assets/icons/icon-72x72.png",

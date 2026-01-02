@@ -3,7 +3,7 @@ export const environment = {
   staging: false,
   development: false,
   apiUrl: import.meta.env.VITE_API_URL || 'https://allocat-gateway-140766457860.northamerica-northeast2.run.app/api',
-  appName: 'Allocat',
+  appName: 'Allocat mERP',
   version: '1.0.0',
   features: {
     enableAnalytics: true,

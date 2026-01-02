@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="card overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead class="bg-gray-50 dark:bg-gray-700">
           <tr>
@@ -34,8 +34,8 @@
 
   <!-- Create User Modal -->
   <div v-if="showCreate" class="fixed inset-0 z-50 flex items-center justify-center">
-    <div class="absolute inset-0 bg-black opacity-50" @click="closeCreate"></div>
-    <div class="relative bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg space-y-4">
+    <div class="absolute inset-0 bg-gray-500/60 backdrop-blur-md" @click="closeCreate"></div>
+    <div class="relative card p-6 w-full max-w-lg space-y-4">
       <h4 class="text-md font-semibold text-gray-900 dark:text-white">Create User</h4>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <input v-model="form.firstName" placeholder="First name" class="px-3 py-2 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600" />

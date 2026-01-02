@@ -3,110 +3,111 @@
     <!-- Logo -->
     <div 
       :class="[
-        'relative h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700',
-        collapsed ? 'flex items-center justify-center' : 'flex items-center justify-between px-4'
+        'h-16 bg-white/40 dark:bg-gray-900/40 backdrop-blur-glass shadow-glass-glow',
+        collapsed ? 'flex items-center justify-center px-2' : 'flex items-center justify-between px-4'
       ]"
     >
       <div v-if="!collapsed" class="flex items-center flex-1 min-w-0">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L3 7v3l9 5 9-5V7L12 2zm0 2.18L18.09 7 12 10.82 5.91 7 12 4.18zM5 9.37l7 3.89v7.56l-7-3.89V9.37zm9 11.45v-7.56l7-3.89v7.56l-7 3.89z"/>
-          </svg>
-        </div>
-        <span class="ml-3 text-xl font-bold text-gray-900 dark:text-white truncate">Allocat</span>
+        <img 
+          src="@/assets/images/logo-icon.png" 
+          alt="Allocat mERP" 
+          class="w-10 h-10 rounded-xl shadow-glow-sm flex-shrink-0 object-contain p-1 bg-white/10 backdrop-blur-sm border border-white/20"
+        />
+        <span class="ml-3 text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap tracking-tight">Allocat mERP</span>
       </div>
       
       <!-- Logo when collapsed (centered) -->
-      <div v-if="collapsed" class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md">
-        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L3 7v3l9 5 9-5V7L12 2zm0 2.18L18.09 7 12 10.82 5.91 7 12 4.18zM5 9.37l7 3.89v7.56l-7-3.89V9.37zm9 11.45v-7.56l7-3.89v7.56l-7 3.89z"/>
-        </svg>
-      </div>
+      <img 
+        v-if="collapsed" 
+        src="@/assets/images/logo-icon.png" 
+        alt="Allocat mERP" 
+        class="w-9 h-9 rounded-xl shadow-glow-sm object-contain p-1 bg-white/10 backdrop-blur-sm border border-white/20"
+      />
       
-      <!-- Toggle button -->
+      <!-- Toggle button (only when expanded) -->
       <button
         v-if="!collapsed"
         @click="$emit('toggle')"
         title="Collapse sidebar"
-        class="touch-button p-3 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-all active:bg-gray-200 flex-shrink-0 mr-2"
-      >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-        </svg>
-      </button>
-      
-      <!-- Toggle button when collapsed (positioned at bottom of logo area) -->
-      <button
-        v-if="collapsed"
-        @click="$emit('toggle')"
-        title="Expand sidebar"
-        class="absolute bottom-0 right-0 p-2 m-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:bg-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm"
+        class="touch-button p-2 rounded-xl text-gray-400 hover:text-primary-500 hover:bg-primary-500/10 dark:hover:bg-primary-500/20 dark:text-gray-500 dark:hover:text-primary-400 transition-all active:bg-primary-500/20 flex-shrink-0"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
         </svg>
       </button>
     </div>
 
+    <!-- Toggle button when collapsed (at top of nav) -->
+    <button
+      v-if="collapsed"
+      @click="$emit('toggle')"
+      title="Expand sidebar"
+      class="mx-auto mt-2 p-2 rounded-xl text-gray-400 hover:text-primary-500 hover:bg-primary-500/10 dark:hover:bg-primary-500/20 transition-all active:bg-primary-500/20"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+      </svg>
+    </button>
+
     <!-- Navigation -->
-    <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+    <nav :class="['flex-1 py-4 space-y-1.5 overflow-y-auto flex flex-col', collapsed ? 'justify-center px-1' : 'justify-start px-2']">
       <template v-for="item in visibleItems" :key="item.name">
         <router-link
           :to="item.href"
           :title="collapsed ? item.name : ''"
           :class="[
-            'group flex items-center px-4 py-3.5 text-base font-medium rounded-xl transition-all duration-200 mb-1 touch-no-select active:scale-98',
-            collapsed ? 'justify-center mx-2' : 'mx-3',
+            'group flex items-center text-sm font-medium rounded-2xl transition-all duration-300 touch-no-select active:scale-95',
+            collapsed ? 'justify-center p-3 mx-auto w-12' : 'px-4 py-3 mx-2',
             isActiveRoute(item.href)
-              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200 shadow-sm'
-              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white active:bg-gray-200'
+              ? 'bg-primary-500/20 text-primary-600 dark:text-primary-300 shadow-glow-sm border border-primary-500/30 dark:border-primary-400/30 backdrop-blur-md'
+              : 'text-gray-700 hover:bg-white/40 dark:hover:bg-white/5 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
           ]"
         >
           <component
             :is="item.icon"
             :class="[
-              'flex-shrink-0 w-6 h-6 transition-colors',
+              'flex-shrink-0 w-6 h-6 transition-transform duration-300 group-hover:scale-110',
               isActiveRoute(item.href)
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+                ? 'text-primary-500 dark:text-primary-400'
+                : 'text-gray-400 group-hover:text-primary-500 dark:group-hover:text-primary-400'
             ]"
           />
-          <span v-if="!collapsed" class="ml-3 truncate">{{ item.name }}</span>
+          <span v-if="!collapsed" class="ml-3 truncate tracking-wide font-semibold">{{ item.name }}</span>
         </router-link>
       </template>
     </nav>
 
     <!-- User section -->
-    <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+    <div class="p-4">
       <div v-if="!collapsed" class="flex items-center">
         <div class="flex-shrink-0">
           <img
             v-if="currentUser?.avatar"
             :src="currentUser.avatar"
             :alt="currentUser.fullName"
-            class="w-8 h-8 rounded-full"
+            class="w-9 h-9 rounded-full border border-primary-500/30"
           />
           <div
             v-else
-            class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center"
+            class="w-9 h-9 rounded-full bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center border border-primary-500/30 shadow-glow-sm"
           >
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span class="text-sm font-bold text-primary-600 dark:text-primary-400">
               {{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}
             </span>
           </div>
         </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium text-gray-900 dark:text-white">
+        <div class="ml-3 min-w-0">
+          <p class="text-sm font-bold text-gray-900 dark:text-white truncate">
             {{ currentUser?.fullName }}
           </p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">
+          <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
             {{ currentUser?.role?.displayName || currentUser?.role?.name }}
           </p>
         </div>
       </div>
       <div v-else class="flex justify-center">
-        <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div class="w-9 h-9 rounded-full bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center border border-primary-500/30 shadow-glow-sm">
+          <span class="text-xs font-bold text-primary-600 dark:text-primary-400">
             {{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}
           </span>
         </div>
@@ -124,10 +125,7 @@ import { useAuthStore } from '@/core/stores/auth'
 import {
   HomeIcon,
   ShoppingCartIcon,
-  CubeIcon,
   ArchiveBoxIcon,
-  ShoppingBagIcon,
-  UsersIcon,
   ChartBarIcon,
   CogIcon
 } from '@heroicons/vue/24/outline'
@@ -163,32 +161,11 @@ const navigationItems = computed(() => [
     permissions: ['orders:create']
   },
   {
-    name: 'Products',
-    href: '/products',
-    icon: CubeIcon,
-    roles: ['INVENTORY_MANAGER', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
-    permissions: ['products:read']
-  },
-  {
     name: 'Inventory',
     href: '/inventory',
     icon: ArchiveBoxIcon,
     roles: ['INVENTORY_MANAGER', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN', 'WAREHOUSE_STAFF'],
     permissions: ['inventory:read']
-  },
-  {
-    name: 'Purchases',
-    href: '/purchases',
-    icon: ShoppingBagIcon,
-    roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
-    permissions: ['orders:read']
-  },
-  {
-    name: 'Customers',
-    href: '/customers',
-    icon: UsersIcon,
-    roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN', 'VIEWER'],
-    permissions: ['customers:read']
   },
   {
     name: 'Reports',
@@ -198,33 +175,14 @@ const navigationItems = computed(() => [
     permissions: ['reports:view']
   },
   {
-    name: 'Analytics',
-    href: '/analytics/enhanced',
-    icon: ChartBarIcon,
-    roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
-    permissions: ['analytics:read']
-  },
-  {
-    name: 'Profitability',
-    href: '/analytics/profitability',
-    icon: ChartBarIcon,
-    roles: ['STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
-    permissions: ['analytics:read']
-  },
-  {
     name: 'Admin',
     href: '/admin',
     icon: CogIcon,
     roles: ['ADMIN', 'SUPER_ADMIN'],
     permissions: ['users:read']
   },
-  {
-    name: 'Users',
-    href: '/admin/users',
-    icon: UsersIcon,
-    roles: ['ADMIN', 'SUPER_ADMIN'],
-    permissions: ['users:read']
-  },
+  // Note: Settings moved to user dropdown in Header
+  // Note: Customers moved to Admin section
   // Note: Stores module is intentionally NOT added to sidebar per requirement
 ])
 
