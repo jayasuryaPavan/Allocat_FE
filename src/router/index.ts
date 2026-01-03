@@ -66,18 +66,12 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/pos',
+    redirect: '/pos-kiosk'
+  },
+  {
+    path: '/pos-admin',
     component: () => import('@/layouts/MainLayout.vue'),
     children: [
-      {
-        path: '',
-        name: 'POS',
-        component: () => import('@/features/pos/views/PosView.vue'),
-        meta: {
-          requiresAuth: true,
-          roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
-          permissions: ['orders:create']
-        }
-      },
       {
         path: 'sales',
         name: 'SalesHistory',

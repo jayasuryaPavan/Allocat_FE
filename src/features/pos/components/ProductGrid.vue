@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { productsApiService } from '@/core/services/productsApi'
 import type { Product } from '@/core/types/inventory'
 import { useNotificationStore } from '@/core/stores/notification'
+
+const props = defineProps<{
+  searchQuery?: string
+}>()
 
 const emit = defineEmits<{
   (e: 'product-selected', product: Product): void
@@ -11,12 +15,15 @@ const emit = defineEmits<{
 const notificationStore = useNotificationStore()
 const products = ref<Product[]>([])
 const isLoading = ref(false)
-const searchQuery = ref('')
+const localSearch = ref('')
+
+// Use prop if provided, otherwise use local search
+const activeSearchQuery = computed(() => props.searchQuery ?? localSearch.value)
 
 const filteredProducts = computed(() => {
-  if (!searchQuery.value) return products.value
+  if (!activeSearchQuery.value) return products.value
   
-  const query = searchQuery.value.toLowerCase()
+  const query = activeSearchQuery.value.toLowerCase()
   return products.value.filter(p => 
     p.name.toLowerCase().includes(query) || 
     p.productCode.toLowerCase().includes(query) ||
@@ -66,7 +73,7 @@ onMounted(() => {
 // Expose filter method if parent wants to filter
 defineExpose({
   filter: (query: string) => {
-    searchQuery.value = query
+    localSearch.value = query
   }
 })
 </script>
@@ -111,8 +118,19 @@ defineExpose({
         <div class="w-full">
           <h3 class="font-semibold text-gray-900 dark:text-white leading-tight mb-1 line-clamp-2">{{ product.name }}</h3>
           <p class="text-xs text-gray-500 dark:text-gray-400 truncate">SKU: {{ product.productCode }}</p>
-          <div v-if="product.unitOfMeasure" class="mt-1 text-xs text-gray-400">
-            {{ product.unitOfMeasure }}
+          <div class="flex items-center justify-between mt-1">
+            <span v-if="product.unitOfMeasure" class="text-xs text-gray-400">{{ product.unitOfMeasure }}</span>
+            <span 
+              v-if="product.availableQuantity !== undefined"
+              :class="[
+                'text-xs font-medium px-1.5 py-0.5 rounded',
+                product.availableQuantity > 0 
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+              ]"
+            >
+              {{ product.availableQuantity > 0 ? `Qty: ${product.availableQuantity}` : 'Out of Stock' }}
+            </span>
           </div>
         </div>
       </button>

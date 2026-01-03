@@ -155,7 +155,7 @@ const navigationItems = computed(() => [
   },
   {
     name: 'POS',
-    href: '/pos',
+    href: '/pos-kiosk',
     icon: ShoppingCartIcon,
     roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
     permissions: ['orders:create']

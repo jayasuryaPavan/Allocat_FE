@@ -30,6 +30,7 @@ const showHeldOrdersModal = ref(false)
 const showReturnModal = ref(false)
 const showQuickAddModal = ref(false)
 const isQuickAddTaxExempt = ref(false)
+const gridSearchQuery = ref('')
 
 const cart = computed(() => posStore.currentCart)
 const activeShift = computed(() => shiftStore.activeShift)
@@ -63,11 +64,7 @@ onMounted(async () => {
     }
   }
 
-  try {
-    await shiftStore.loadActiveShift(getStoreId(), getUserId())
-  } catch (error) {
-    // ignore
-  }
+  // Note: loadActiveShift API call removed - no longer needed for kiosk mode
 })
 
 const handleProductSelected = async (product: any) => {
@@ -149,7 +146,7 @@ const handlePaymentComplete = async (paymentData: any) => {
     <div class="w-full md:w-2/3 flex flex-col gap-4">
       <!-- Top Bar: Product Search (Full Width) -->
       <div class="card p-4">
-        <ProductSearch @product-selected="handleProductSelected" />
+        <ProductSearch @product-selected="handleProductSelected" @search="(q: string) => gridSearchQuery = q" />
       </div>
 
       <!-- Quick Add Buttons - Tax Exempt and Taxable -->
@@ -174,7 +171,7 @@ const handlePaymentComplete = async (paymentData: any) => {
 
       <!-- Main Content Area (Product Grid) -->
       <div class="flex-1 card p-2 overflow-hidden bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-0">
-        <ProductGrid @product-selected="handleProductSelected" />
+        <ProductGrid :search-query="gridSearchQuery" @product-selected="handleProductSelected" />
       </div>
 
       <!-- Action Buttons - Touch Optimized with Glass Effect -->

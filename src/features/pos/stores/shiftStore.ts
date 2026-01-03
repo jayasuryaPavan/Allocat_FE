@@ -216,9 +216,25 @@ export const useShiftStore = defineStore('shift', () => {
 
     isLoading.value = true
     try {
-      // Verify passcode before sign out
-      const resp = await shiftApiService.verifyAssociatePasscode(signedInAssociate.value.id, passcode)
-      if (!resp.success) throw new Error('Invalid PIN')
+      // Verify passcode before sign out (skip if passcode is empty - force logout)
+      if (passcode && passcode.length === 4) {
+        const resp = await shiftApiService.verifyAssociatePasscode(signedInAssociate.value.id, passcode)
+        if (!resp.success) throw new Error('Invalid PIN')
+      }
+
+      // End the shift if we have a shiftId
+      if (signedInAssociate.value.shiftId) {
+        try {
+          await shiftApiService.endShift(
+            signedInAssociate.value.shiftId,
+            signedInAssociate.value.id,
+            { endingCashAmount: 0 } // Default to 0 for simple kiosk mode
+          )
+        } catch (e) {
+          console.warn('Failed to end shift:', e)
+          // Continue with logout even if shift end fails
+        }
+      }
 
       // Record logout
       await recordLogout(signedInAssociate.value.id)
