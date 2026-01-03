@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { usePosStore } from '../stores/posStore'
 import { useShiftStore } from '../stores/shiftStore'
 import { useAuthStore } from '@/core/stores/auth'
@@ -11,12 +12,17 @@ import DiscountDialog from '../components/DiscountDialog.vue'
 import HeldOrdersModal from '../components/HeldOrdersModal.vue'
 import ReturnOrderModal from '../components/ReturnOrderModal.vue'
 import QuickAddItemModal from '../components/QuickAddItemModal.vue'
+import ProductGrid from '../components/ProductGrid.vue'
 import type { CheckoutRequest } from '../types'
 
+const route = useRoute()
 const posStore = usePosStore()
 const shiftStore = useShiftStore()
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
+
+// Check if we're in kiosk mode (fullScreen route meta or /pos-kiosk path)
+const isKioskMode = computed(() => route.meta?.fullScreen === true || route.path.includes('pos-kiosk'))
 
 const showPaymentModal = ref(false)
 const showDiscountDialog = ref(false)
@@ -27,6 +33,7 @@ const isQuickAddTaxExempt = ref(false)
 
 const cart = computed(() => posStore.currentCart)
 const activeShift = computed(() => shiftStore.activeShift)
+
 
 const getStoreId = () => Number((authStore.currentUser as any)?.storeId ?? 1)
 const getUserId = () => Number(authStore.currentUser?.id ?? 1)
@@ -66,6 +73,19 @@ onMounted(async () => {
 const handleProductSelected = async (product: any) => {
   if (cart.value?.cartId) {
     await posStore.addItem(cart.value.cartId, product.id, undefined, 1)
+  } else {
+    // If cart creation failed or is seemingly missing, try to recreate it first
+    try {
+      if (import.meta.env.DEV) console.warn('Cart missing, attempting to recreate...')
+      await posStore.createCart(getStoreId(), getUserId())
+      if (cart.value?.cartId) {
+         await posStore.addItem(cart.value.cartId, product.id, undefined, 1)
+      } else {
+         notificationStore.error('Cart Error', 'Unable to initialize cart. Please refresh the page.')
+      }
+    } catch (e) {
+      notificationStore.error('Cart Error', 'Failed to add item to cart')
+    }
   }
 }
 
@@ -124,7 +144,7 @@ const handlePaymentComplete = async (paymentData: any) => {
 </script>
 
 <template>
-  <div class="h-[calc(100vh-6rem)] flex flex-col md:flex-row gap-4 p-4">
+  <div :class="[isKioskMode ? 'h-screen pt-20' : 'h-[calc(100vh-6rem)]', 'flex flex-col md:flex-row gap-4 p-4']">
     <!-- Left Panel: Product Search & Actions -->
     <div class="w-full md:w-2/3 flex flex-col gap-4">
       <!-- Top Bar: Product Search (Full Width) -->
@@ -152,13 +172,9 @@ const handlePaymentComplete = async (paymentData: any) => {
         </button>
       </div>
 
-      <!-- Main Content Area (Placeholder for Grid/Quick Keys) -->
-      <div class="flex-1 card p-4 flex items-center justify-center text-gray-400 border-2 border-dashed border-primary-200 dark:border-primary-800">
-        <div class="text-center">
-          <i class="fas fa-th text-4xl mb-2"></i>
-          <p>Quick Keys / Product Grid</p>
-          <p class="text-sm">(Coming Soon)</p>
-        </div>
+      <!-- Main Content Area (Product Grid) -->
+      <div class="flex-1 card p-2 overflow-hidden bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-0">
+        <ProductGrid @product-selected="handleProductSelected" />
       </div>
 
       <!-- Action Buttons - Touch Optimized with Glass Effect -->

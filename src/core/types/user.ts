@@ -21,6 +21,8 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   STORE_MANAGER = 'STORE_MANAGER',
   SALES_STAFF = 'SALES_STAFF',
+  POS_USER = 'POS_USER',           // Kiosk terminal access (Tier 1)
+  ASSOCIATE = 'ASSOCIATE',          // Shift sign-in/out tracking (Tier 2)
   INVENTORY_MANAGER = 'INVENTORY_MANAGER',
   WAREHOUSE_STAFF = 'WAREHOUSE_STAFF',
   ACCOUNTANT = 'ACCOUNTANT',

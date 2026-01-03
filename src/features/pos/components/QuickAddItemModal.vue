@@ -147,7 +147,7 @@ const handleAddItem = async () => {
       taxExempt: props.isTaxExempt
     })
     
-    notificationStore.success('Item Added', `${itemDescription.value} added to cart`)
+    // notificationStore.success('Item Added', `${itemDescription.value} added to cart`)
     emit('close')
   } catch (error: any) {
     console.error('Add item failed:', error)

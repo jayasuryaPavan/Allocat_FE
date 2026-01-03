@@ -92,20 +92,6 @@
           </Teleport>
         </div>
 
-        <!-- Development Toggle (only in development) -->
-        <div v-if="isDevelopment" class="mr-4">
-          <button
-            @click="toggleDevMode"
-            :class="[
-              'px-3 py-1 text-xs font-medium rounded-full transition-colors',
-              isDevMode ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-            ]"
-            title="Toggle Development Mode"
-          >
-            {{ isDevMode ? 'DEV ON' : 'DEV OFF' }}
-          </button>
-        </div>
-
         <!-- User menu -->
         <div class="relative">
           <button
@@ -237,10 +223,6 @@ const themeStore = useThemeStore()
 const showUserMenu = ref(false)
 const showNotifications = ref(false)
 const hasUnreadNotifications = ref(false)
-const isDevMode = ref(environment.features.enableDevBypass)
-
-// Computed
-const isDevelopment = computed(() => environment.development)
 
 // Computed
 const currentUser = computed(() => authStore.currentUser)
@@ -306,21 +288,6 @@ const toggleUserMenu = () => {
 const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value
   showUserMenu.value = false
-}
-
-const toggleDevMode = () => {
-  isDevMode.value = !isDevMode.value
-  environment.features.enableDevBypass = isDevMode.value
-  
-  if (isDevMode.value) {
-    // Re-initialize auth with dev bypass
-    authStore.initializeAuth()
-    console.log('🚀 Development mode enabled - Auto-logged in')
-  } else {
-    // Logout and require real authentication
-    authStore.logout()
-    console.log('🔒 Development mode disabled - Authentication required')
-  }
 }
 
 const handleClickOutside = (event: MouseEvent) => {

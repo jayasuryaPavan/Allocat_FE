@@ -4,12 +4,24 @@ import { shiftApiService } from '@/core/services/shiftApi'
 import { useNotificationStore } from '@/core/stores/notification'
 import type { Shift, ShiftSwap, SalesPersonLogin } from '../types'
 
+// Associate state interface for POS Kiosk mode
+interface SignedInAssociate {
+  id: number
+  associateNumber: string
+  name: string
+  signInTime: string
+  shiftId?: number
+}
+
 export const useShiftStore = defineStore('shift', () => {
   const activeShift = ref<Shift | null>(null)
   const swaps = ref<ShiftSwap[]>([])
   const pendingSwaps = ref<ShiftSwap[]>([])
   const loginHistory = ref<SalesPersonLogin[]>([])
   const isLoading = ref(false)
+
+  // Associate state for POS Kiosk mode (Tier 2)
+  const signedInAssociate = ref<SignedInAssociate | null>(null)
 
   const notificationStore = useNotificationStore()
 
@@ -166,6 +178,63 @@ export const useShiftStore = defineStore('shift', () => {
     if (resp.success) loginHistory.value = resp.data
   }
 
+  // ========= Associate Sign-In/Sign-Out for POS Kiosk Mode (Tier 2) =========
+
+  const signInAssociate = async (storeId: number, associateNumber: string, passcode: string) => {
+    isLoading.value = true
+    try {
+      const resp = await shiftApiService.authenticateAssociate(storeId, associateNumber, passcode)
+      if (!resp.success) throw new Error(resp.message || 'Invalid credentials')
+
+      signedInAssociate.value = {
+        id: resp.data.userId,
+        associateNumber: resp.data.associateNumber,
+        name: resp.data.name,
+        signInTime: new Date().toLocaleTimeString(),
+        shiftId: resp.data.shiftId
+      }
+
+      // Record the login
+      await recordLogin(resp.data.userId, {
+        storeId,
+        shiftId: resp.data.shiftId,
+        loginType: 'SHIFT_START'
+      })
+
+      notificationStore.success('Signed In', `Welcome, ${resp.data.name}!`)
+      return resp.data
+    } catch (error: any) {
+      notificationStore.error('Sign In Failed', error.message || 'Invalid credentials')
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const signOutAssociate = async (passcode: string) => {
+    if (!signedInAssociate.value) throw new Error('No associate signed in')
+
+    isLoading.value = true
+    try {
+      // Verify passcode before sign out
+      const resp = await shiftApiService.verifyAssociatePasscode(signedInAssociate.value.id, passcode)
+      if (!resp.success) throw new Error('Invalid PIN')
+
+      // Record logout
+      await recordLogout(signedInAssociate.value.id)
+
+      const name = signedInAssociate.value.name
+      signedInAssociate.value = null
+
+      notificationStore.success('Signed Out', `Goodbye, ${name}!`)
+    } catch (error: any) {
+      notificationStore.error('Sign Out Failed', error.message || 'Invalid PIN')
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     activeShift,
     swaps,
@@ -173,6 +242,7 @@ export const useShiftStore = defineStore('shift', () => {
     loginHistory,
     isLoading,
     hasActiveShift,
+    signedInAssociate,
     loadActiveShift,
     startShift,
     endShift,
@@ -187,6 +257,9 @@ export const useShiftStore = defineStore('shift', () => {
     loadSwapsByUser,
     recordLogin,
     recordLogout,
-    loadLoginHistory
+    loadLoginHistory,
+    signInAssociate,
+    signOutAssociate
   }
 })
+

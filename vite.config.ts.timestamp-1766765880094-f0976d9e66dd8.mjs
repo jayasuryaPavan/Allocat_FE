@@ -17,7 +17,7 @@ var vite_config_default = defineConfig({
     }
   },
   server: {
-    port: 4200,
+    port: 5173,
     open: true,
     cors: true,
     proxy: {

@@ -128,7 +128,14 @@ export const useAuthStore = defineStore('auth', () => {
       // Optionally hydrate full user profile
       try { await fetchCurrentUser() } catch { }
 
-      const redirect = redirectUrl.value || '/dashboard'
+      // Redirect based on user role - POS_USER and ASSOCIATE go to kiosk mode
+      const roleName = String(mappedUser.role?.name || '').toUpperCase()
+      let redirect = redirectUrl.value || '/dashboard'
+
+      if (roleName === 'POS_USER' || roleName === 'ASSOCIATE') {
+        redirect = '/pos-kiosk'
+      }
+
       clearRedirectUrl()
       router.push(redirect)
 

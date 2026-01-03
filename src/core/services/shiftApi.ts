@@ -143,6 +143,35 @@ class ShiftApiService {
     const response = await this.apiService.get<ApiResponse<SalesPersonLogin[]>>(url)
     return response.data
   }
+
+  // ========= Associate Authentication for POS Kiosk Mode =========
+
+  async authenticateAssociate(storeId: number, associateNumber: string, passcode: string): Promise<ApiResponse<{
+    userId: number
+    associateNumber: string
+    name: string
+    shiftId: number
+  }>> {
+    const response = await this.apiService.post<ApiResponse<{
+      userId: number
+      associateNumber: string
+      name: string
+      shiftId: number
+    }>>(
+      `${this.baseUrl}/associate/authenticate`,
+      { storeId, associateNumber, passcode }
+    )
+    return response.data
+  }
+
+  async verifyAssociatePasscode(userId: number, passcode: string): Promise<ApiResponse<boolean>> {
+    const response = await this.apiService.post<ApiResponse<boolean>>(
+      `${this.baseUrl}/associate/verify-passcode`,
+      { userId, passcode }
+    )
+    return response.data
+  }
 }
 
 export const shiftApiService = new ShiftApiService()
+
