@@ -21,6 +21,9 @@ export interface Product {
   dimensions?: string
   createdAt?: string
   updatedAt?: string
+  // Inventory fields (may be populated by API)
+  availableQuantity?: number
+  currentQuantity?: number
 }
 
 // Received Stock interface matching backend API exactly
@@ -198,7 +201,7 @@ export const INVENTORY_CSV_COLUMNS: InventoryCSVColumn[] = [
 // JSON Upload columns mapping
 export const JSON_UPLOAD_COLUMNS = [
   'productCode',
-  'productName', 
+  'productName',
   'expectedQuantity',
   'unitPrice',
   'supplierName',

@@ -47,20 +47,31 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
+  // POS Kiosk Mode (for POS_USER role - two-tier authentication)
   {
-    path: '/pos',
-    component: () => import('@/layouts/MainLayout.vue'),
+    path: '/pos-kiosk',
+    component: () => import('@/layouts/PosKioskLayout.vue'),
     children: [
       {
         path: '',
-        name: 'POS',
+        name: 'PosKiosk',
         component: () => import('@/features/pos/views/PosView.vue'),
         meta: {
           requiresAuth: true,
-          roles: ['SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
-          permissions: ['orders:create']
+          roles: ['POS_USER', 'ASSOCIATE', 'SALES_STAFF', 'STORE_MANAGER', 'ADMIN', 'SUPER_ADMIN'],
+          fullScreen: true
         }
-      },
+      }
+    ]
+  },
+  {
+    path: '/pos',
+    redirect: '/pos-kiosk'
+  },
+  {
+    path: '/pos-admin',
+    component: () => import('@/layouts/MainLayout.vue'),
+    children: [
       {
         path: 'sales',
         name: 'SalesHistory',

@@ -4,7 +4,7 @@ import { useApiService } from '@/core/services/api'
 import { useNotificationStore } from '@/core/stores/notification'
 import { usePosStore } from '../stores/posStore'
 
-const emit = defineEmits(['product-selected'])
+const emit = defineEmits(['product-selected', 'search'])
 
 const searchQuery = ref('')
 const searchResults = ref<any[]>([])
@@ -21,6 +21,9 @@ let searchTimeout: number | undefined
 
 const handleSearch = () => {
   if (searchTimeout) clearTimeout(searchTimeout)
+  
+  // Emit search query to parent for ProductGrid filtering
+  emit('search', searchQuery.value)
   
   if (!searchQuery.value || searchQuery.value.length < 2) {
     searchResults.value = []

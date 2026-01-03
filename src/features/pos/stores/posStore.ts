@@ -41,7 +41,7 @@ export const usePosStore = defineStore('pos', () => {
             })
             const errorMessage = error.response?.status === 404
                 ? 'POS endpoint not found. Please ensure the backend is running on port 8080.'
-                : error.response?.data?.message || error.message || 'Unknown error'
+                : error.response?.data?.error || error.response?.data?.message || error.message || 'Unknown error'
             notificationStore.error('Failed to create cart', errorMessage)
             throw error
         } finally {
@@ -59,7 +59,7 @@ export const usePosStore = defineStore('pos', () => {
                 throw new Error(response.data?.message || 'Failed to load cart')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to load cart', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to load cart', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -73,12 +73,12 @@ export const usePosStore = defineStore('pos', () => {
             const response = await apiService.post(`/pos/cart/${cartId}/items`, payload)
             if (response.data?.success) {
                 currentCart.value = response.data.data
-                notificationStore.success('Item added', 'Product added to cart')
+                // notificationStore.success('Item added', 'Product added to cart')
             } else {
                 throw new Error(response.data?.message || 'Failed to add item')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to add item', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to add item', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -143,7 +143,7 @@ export const usePosStore = defineStore('pos', () => {
                 throw new Error(response.data?.message || 'Failed to update item')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to update item', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to update item', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -156,12 +156,12 @@ export const usePosStore = defineStore('pos', () => {
             const response = await apiService.delete(`/pos/cart/${cartId}/items/${itemId}`)
             if (response.data?.success) {
                 currentCart.value = response.data.data
-                notificationStore.info('Item removed', 'Product removed from cart')
+                // notificationStore.info('Item removed', 'Product removed from cart')
             } else {
                 throw new Error(response.data?.message || 'Failed to remove item')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to remove item', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to remove item', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -174,12 +174,12 @@ export const usePosStore = defineStore('pos', () => {
             const response = await apiService.post(`/pos/cart/${cartId}/discount?code=${code}`)
             if (response.data?.success) {
                 currentCart.value = response.data.data
-                notificationStore.success('Discount applied', `Discount code ${code} applied`)
+                // notificationStore.success('Discount applied', `Discount code ${code} applied`)
             } else {
                 throw new Error(response.data?.message || 'Failed to apply discount')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to apply discount', error.response?.data?.message || 'Invalid discount code')
+            notificationStore.error('Failed to apply discount', error.response?.data?.error || error.response?.data?.message || 'Invalid discount code')
             throw error
         } finally {
             isLoading.value = false
@@ -192,12 +192,12 @@ export const usePosStore = defineStore('pos', () => {
             const response = await apiService.delete(`/pos/cart/${cartId}/discount`)
             if (response.data?.success) {
                 currentCart.value = response.data.data
-                notificationStore.info('Discount removed', 'Discount removed from cart')
+                // notificationStore.info('Discount removed', 'Discount removed from cart')
             } else {
                 throw new Error(response.data?.message || 'Failed to remove discount')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to remove discount', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to remove discount', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -210,12 +210,12 @@ export const usePosStore = defineStore('pos', () => {
             const response = await apiService.delete(`/pos/cart/${cartId}`)
             if (response.data?.success) {
                 currentCart.value = null
-                notificationStore.info('Cart cleared', 'All items removed from cart')
+                // notificationStore.info('Cart cleared', 'All items removed from cart')
             } else {
                 throw new Error(response.data?.message || 'Failed to clear cart')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to clear cart', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to clear cart', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -228,13 +228,13 @@ export const usePosStore = defineStore('pos', () => {
             const response = await apiService.post(`/pos/cart/${checkoutData.cartId}/checkout`, checkoutData)
             if (response.data?.success) {
                 currentCart.value = null
-                notificationStore.success('Checkout successful', 'Order completed successfully')
+                // notificationStore.success('Checkout successful', 'Order completed successfully')
                 return response.data.data // Returns the created SalesOrder
             } else {
                 throw new Error(response.data?.message || 'Checkout failed')
             }
         } catch (error: any) {
-            notificationStore.error('Checkout failed', error.response?.data?.message || 'Transaction failed')
+            notificationStore.error('Checkout failed', error.response?.data?.error || error.response?.data?.message || 'Transaction failed')
             throw error
         } finally {
             isProcessingPayment.value = false
@@ -247,12 +247,12 @@ export const usePosStore = defineStore('pos', () => {
             const response = await apiService.post(`/pos/cart/${cartId}/hold`, { customerId, notes })
             if (response.data?.success) {
                 currentCart.value = null
-                notificationStore.success('Order Suspended', 'Order has been parked successfully')
+                // notificationStore.success('Order Suspended', 'Order has been parked successfully')
             } else {
                 throw new Error(response.data?.message || 'Failed to suspend order')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to suspend order', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to suspend order', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -268,7 +268,7 @@ export const usePosStore = defineStore('pos', () => {
             }
             return []
         } catch (error: any) {
-            notificationStore.error('Failed to fetch held orders', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to fetch held orders', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -311,12 +311,12 @@ export const usePosStore = defineStore('pos', () => {
                     throw new Error(finalCartResp.data?.message || 'Failed to retrieve cart after resuming order')
                 }
 
-                notificationStore.success('Order Resumed', 'Order retrieved successfully')
+                // notificationStore.success('Order Resumed', 'Order retrieved successfully')
             } else {
                 throw new Error(response.data?.message || 'Failed to resume order')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to resume order', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to resume order', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false
@@ -328,13 +328,13 @@ export const usePosStore = defineStore('pos', () => {
         try {
             const response = await apiService.post('/pos/returns', returnRequest)
             if (response.data?.success) {
-                notificationStore.success('Return Processed', 'Return has been processed successfully')
+                // notificationStore.success('Return Processed', 'Return has been processed successfully')
                 return response.data.data
             } else {
                 throw new Error(response.data?.message || 'Failed to process return')
             }
         } catch (error: any) {
-            notificationStore.error('Failed to process return', error.response?.data?.message || 'Unknown error')
+            notificationStore.error('Failed to process return', error.response?.data?.error || error.response?.data?.message || 'Unknown error')
             throw error
         } finally {
             isLoading.value = false

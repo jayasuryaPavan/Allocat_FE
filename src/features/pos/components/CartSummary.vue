@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { usePosStore } from '../stores/posStore'
 import CartItem from './CartItem.vue'
+import ConfirmDialog from './ConfirmDialog.vue'
 
 const posStore = usePosStore()
+
+const showClearCartDialog = ref(false)
 
 const cart = computed(() => posStore.currentCart)
 const items = computed(() => posStore.currentCart?.items || [])
@@ -29,11 +32,16 @@ const handleRemoveItem = (itemId: string) => {
   }
 }
 
-const handleClearCart = () => {
-  if (cart.value?.cartId) {
-    if (confirm('Are you sure you want to clear the cart?')) {
-      posStore.clearCart(cart.value.cartId)
+const handleClearCartClick = () => {
+    if (cart.value?.cartId && items.value.length > 0) {
+        showClearCartDialog.value = true
     }
+}
+
+const confirmClearCart = () => {
+  if (cart.value?.cartId) {
+    posStore.clearCart(cart.value.cartId)
+    showClearCartDialog.value = false
   }
 }
 </script>
@@ -48,7 +56,7 @@ const handleClearCart = () => {
       <button 
         v-if="items.length > 0"
         class="touch-button min-h-[48px] px-4 py-2 text-base text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 active:text-red-800 active:bg-red-50 dark:active:bg-red-900/20 font-semibold rounded-lg transition-all touch-no-select"
-        @click="handleClearCart"
+        @click="handleClearCartClick"
       >
         Clear All
       </button>
@@ -95,5 +103,16 @@ const handleClearCart = () => {
 
       <slot name="actions"></slot>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmDialog
+      :is-open="showClearCartDialog"
+      title="Clear Cart"
+      message="Are you sure you want to remove all items from the cart? This action cannot be undone."
+      confirm-text="Clear Cart"
+      @confirm="confirmClearCart"
+      @cancel="showClearCartDialog = false"
+      @close="showClearCartDialog = false"
+    />
   </div>
 </template>
